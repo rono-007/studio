@@ -115,8 +115,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     }
 
     if (user && !user.emailVerified) {
+        // We can still allow usage, but show a toast.
         showVerificationToast();
-        return;
     }
 
     setIsLoading(true);
@@ -196,8 +196,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     }
     
     if (user && !user.emailVerified) {
-        showVerificationToast();
-        return;
+      showVerificationToast();
     }
   
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
@@ -411,7 +410,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             size="icon"
             onClick={() => fileInputRef.current?.click()}
             aria-label="Upload document"
-            disabled={isLoading || isGuestLimitReached || (!!user && !user.emailVerified)}
+            disabled={isLoading || isGuestLimitReached}
           >
             <Paperclip className="h-5 w-5" />
           </Button>
@@ -419,10 +418,10 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={session.document ? `Ask about ${session.document.name}...` : "Ask a question..."}
-            disabled={isLoading || isGuestLimitReached || (!!user && !user.emailVerified)}
+            disabled={isLoading || isGuestLimitReached}
             autoComplete="off"
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || isGuestLimitReached || (!!user && !user.emailVerified)} aria-label="Send message">
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || isGuestLimitReached} aria-label="Send message">
             <SendHorizonal className="h-5 w-5" />
           </Button>
         </form>
