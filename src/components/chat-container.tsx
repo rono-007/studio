@@ -14,17 +14,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { parseDocument } from '@/ai/flows/parse-document';
 import { answerQuestions } from '@/ai/flows/answer-questions';
 import { useToast } from '@/hooks/use-toast';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import { Label } from './ui/label';
@@ -292,42 +281,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   };
 
   return (
-    <Card className="w-full max-w-3xl h-[85vh] flex flex-col shadow-2xl">
-      <CardHeader className="flex flex-row items-center justify-between py-4 px-6">
-        <div className="w-8"></div> {/* Spacer to balance the clear chat icon */}
-        <CardTitle className="text-2xl font-bold flex items-center gap-2">
-          <Bot className="text-primary" /> Infinitus
-        </CardTitle>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Trash2 />
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will clear all messages in this chat. This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => {
-                  onSessionUpdate(session.id, {
-                      messages: [{
-                          id: 'init',
-                          role: 'assistant',
-                          content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
-                      }],
-                      document: null,
-                  })
-              }}>Clear</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </CardHeader>
-      <CardContent className="flex-grow overflow-hidden flex flex-col">
+    <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl border-0">
+      <CardContent className="flex-grow overflow-hidden flex flex-col p-0">
         {session.document && (
             <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">

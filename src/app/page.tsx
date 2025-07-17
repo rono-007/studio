@@ -36,6 +36,7 @@ import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
+import { CardTitle } from '@/components/ui/card';
 
 const GUEST_SESSIONS_KEY = 'infinitus_guest_sessions';
 const ACTIVE_GUEST_SESSION_ID_KEY = 'infinitus_active_guest_session_id';
@@ -151,6 +152,19 @@ export default function Home() {
         }
         return newSessions;
     });
+  }
+
+  const clearActiveChat = () => {
+    if (activeSessionId) {
+      updateSession(activeSessionId, {
+        messages: [{
+          id: 'init',
+          role: 'assistant',
+          content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
+        }],
+        document: null,
+      });
+    }
   }
 
   const handleStartEdit = (session: ChatSession) => {
@@ -292,7 +306,35 @@ export default function Home() {
       </Sidebar>
       <SidebarInset>
         <div className="flex flex-col h-screen">
-            <header className="p-2 border-b flex items-center gap-2">
+             <header className="p-2 border-b flex items-center justify-between gap-2 h-14">
+              {activeSession ? (
+                <>
+                  <CardTitle className="text-2xl font-bold flex items-center gap-2">
+                    <Bot className="text-primary" /> ParseAI
+                  </CardTitle>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <Trash2 />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will clear all messages in this chat. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={clearActiveChat}>Clear</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
+              ) : (
+                 <div></div> 
+              )}
             </header>
             <main className="flex-grow flex items-center justify-center p-4">
               {activeSession ? (
