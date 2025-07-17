@@ -9,7 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { parseDocument } from '@/ai/flows/parse-document';
 import { answerQuestions } from '@/ai/flows/answer-questions';
@@ -305,7 +305,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   return (
     <Card className="w-full h-full flex flex-col shadow-none border-none rounded-none md:rounded-lg md:border">
-      <CardHeader className="flex flex-row items-center justify-between py-4 px-6 shrink-0">
+      <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0">
         <CardTitle className="w-full text-center text-2xl font-bold flex items-center justify-center gap-2">
           <Bot className="text-primary" /> Infinitus
         </CardTitle>
@@ -361,6 +361,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                 </div>
                  {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">
+                    {user?.photoURL && <AvatarImage src={user.photoURL} alt={user.displayName || 'User Avatar'} />}
                     <AvatarFallback>
                       <User size={20} />
                     </AvatarFallback>
