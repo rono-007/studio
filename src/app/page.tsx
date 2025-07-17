@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Bot, MessageSquarePlus, Trash2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Bot, MessageSquarePlus, Trash2, Pencil } from 'lucide-react';
 import { ChatContainer, type ChatSession, type Message, type DocumentState } from '@/components/chat-container';
 import {
   Sidebar,
@@ -18,6 +18,7 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +34,10 @@ import {
 export default function Home() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState('');
   const [isClient, setIsClient] = useState(false);
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -43,12 +47,13 @@ export default function Home() {
 
       if (storedSessions) {
         const parsedSessions = JSON.parse(storedSessions);
-        setSessions(parsedSessions);
-        
-        if (storedActiveId && parsedSessions.some((s: ChatSession) => s.id === storedActiveId)) {
-          setActiveSessionId(storedActiveId);
-        } else if (parsedSessions.length > 0) {
-          setActiveSessionId(parsedSessions[0].id);
+        if (parsedSessions.length > 0) {
+          setSessions(parsedSessions);
+          if (storedActiveId && parsedSessions.some((s: ChatSession) => s.id === storedActiveId)) {
+            setActiveSessionId(storedActiveId);
+          } else {
+            setActiveSessionId(parsedSessions[0].id);
+          }
         } else {
           createNewSession();
         }
@@ -78,6 +83,12 @@ export default function Home() {
     }
   }, [sessions, activeSessionId, isClient]);
 
+   useEffect(() => {
+    if (editingSessionId && editInputRef.current) {
+      editInputRef.current.focus();
+    }
+  }, [editingSessionId]);
+
   const createNewSession = () => {
     const newSession: ChatSession = {
       id: `session_${Date.now()}`,
@@ -106,15 +117,41 @@ export default function Home() {
             if (newSessions.length > 0) {
                 setActiveSessionId(newSessions[0].id);
             } else {
-                createNewSession();
+                // This will also handle creating a new session if all are deleted
+                setActiveSessionId(null);
             }
         }
         if (newSessions.length === 0) {
             localStorage.removeItem('parseai_sessions');
             localStorage.removeItem('parseai_active_session_id');
+            createNewSession();
         }
         return newSessions;
     });
+  }
+
+  const handleStartEdit = (session: ChatSession) => {
+    setEditingSessionId(session.id);
+    setEditingTitle(session.title);
+  }
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditingTitle(e.target.value);
+  }
+
+  const handleFinishEdit = () => {
+    if (editingSessionId && editingTitle.trim()) {
+      updateSession(editingSessionId, { title: editingTitle.trim() });
+    }
+    setEditingSessionId(null);
+  }
+
+  const handleEditKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleFinishEdit();
+    } else if (e.key === 'Escape') {
+      setEditingSessionId(null);
+    }
   }
 
   const activeSession = sessions.find(s => s.id === activeSessionId);
@@ -136,32 +173,50 @@ export default function Home() {
           <SidebarMenu>
             {sessions.map((session) => (
               <SidebarMenuItem key={session.id}>
-                <SidebarMenuButton
-                  onClick={() => setActiveSessionId(session.id)}
-                  isActive={session.id === activeSessionId}
-                  className="truncate"
-                >
-                  {session.title}
-                </SidebarMenuButton>
-                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                     <SidebarMenuAction showOnHover>
-                      <Trash2 />
-                    </SidebarMenuAction>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will permanently delete this chat session.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => deleteSession(session.id)}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                {editingSessionId === session.id ? (
+                  <Input
+                    ref={editInputRef}
+                    value={editingTitle}
+                    onChange={handleTitleChange}
+                    onBlur={handleFinishEdit}
+                    onKeyDown={handleEditKeyDown}
+                    className="h-8 w-full"
+                  />
+                ) : (
+                  <SidebarMenuButton
+                    onClick={() => setActiveSessionId(session.id)}
+                    isActive={session.id === activeSessionId}
+                    className="truncate"
+                  >
+                    {session.title}
+                  </SidebarMenuButton>
+                )}
+                 <div className="flex items-center">
+                    {editingSessionId !== session.id && (
+                        <SidebarMenuAction showOnHover onClick={() => handleStartEdit(session)}>
+                            <Pencil />
+                        </SidebarMenuAction>
+                    )}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                         <SidebarMenuAction showOnHover>
+                          <Trash2 />
+                        </SidebarMenuAction>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently delete this chat session.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => deleteSession(session.id)}>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                 </div>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
@@ -180,7 +235,8 @@ export default function Home() {
                 />
             ) : (
                 <div className="flex flex-col items-center justify-center h-full">
-                    <p>Select a chat or start a new one.</p>
+                    <Bot size={48} className="text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">Select a chat or start a new one.</p>
                 </div>
             )}
         </div>
