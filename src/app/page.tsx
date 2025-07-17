@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut, PanelLeft, X } from 'lucide-react';
+import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut } from 'lucide-react';
 import { ChatContainer, type ChatSession } from '@/components/chat-container';
 import {
   Sidebar,
@@ -16,7 +16,6 @@ import {
   SidebarProvider,
   SidebarFooter,
   SidebarTrigger,
-  SheetClose
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,7 +35,6 @@ import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
-import { CardTitle } from '@/components/ui/card';
 
 const GUEST_SESSIONS_KEY = 'infinitus_guest_sessions';
 const ACTIVE_GUEST_SESSION_ID_KEY = 'infinitus_active_guest_session_id';
@@ -152,19 +150,6 @@ export default function Home() {
         }
         return newSessions;
     });
-  }
-
-  const clearActiveChat = () => {
-    if (activeSessionId) {
-      updateSession(activeSessionId, {
-        messages: [{
-          id: 'init',
-          role: 'assistant',
-          content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
-        }],
-        document: null,
-      });
-    }
   }
 
   const handleStartEdit = (session: ChatSession) => {
@@ -306,7 +291,7 @@ export default function Home() {
       </Sidebar>
       <SidebarInset>
         <div className="h-screen flex flex-col">
-            <main className="flex-grow p-4 flex justify-center items-center">
+            <main className="flex-grow flex justify-center items-center">
               {activeSession ? (
                   <ChatContainer
                       key={activeSession.id}
@@ -325,3 +310,5 @@ export default function Home() {
     </SidebarProvider>
   );
 }
+
+    

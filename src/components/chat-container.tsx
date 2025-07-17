@@ -304,7 +304,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   };
 
   return (
-    <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl border-0">
+    <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl">
       <CardHeader className="flex flex-row items-center py-4 px-6">
           <CardTitle className="w-full text-center text-2xl font-bold flex items-center justify-center gap-2">
             <Bot className="text-primary" /> Infinitus
@@ -461,3 +461,5 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
+
+    
