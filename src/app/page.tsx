@@ -16,6 +16,7 @@ import {
   SidebarProvider,
   SidebarFooter,
   SidebarTrigger,
+  SheetClose
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -239,7 +240,7 @@ export default function Home() {
                     variant="ghost"
                     onClick={() => setActiveSessionId(session.id)}
                     isActive={session.id === activeSessionId}
-                    className="truncate data-[active=true]:bg-transparent data-[active=true]:border data-[active=true]:border-white"
+                    className="truncate justify-center data-[active=true]:bg-transparent data-[active=true]:border data-[active=true]:border-white"
                   >
                     {session.title}
                   </SidebarMenuButton>
@@ -278,12 +279,12 @@ export default function Home() {
             {user ? (
                 <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
                     <LogOut className="mr-2" />
-                    Logout
+                    <span className="duration-200 transition-[width] ease-linear group-data-[collapsible=icon]/sidebar-wrapper:w-0 group-data-[collapsible=icon]/sidebar-wrapper:opacity-0 group-data-[collapsible=icon]/sidebar-wrapper:ml-0 ml-2">Logout</span>
                 </Button>
             ) : (
                 <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/login')}>
                     <LogIn className="mr-2" />
-                    Login / Sign Up
+                    <span className="duration-200 transition-[width] ease-linear group-data-[collapsible=icon]/sidebar-wrapper:w-0 group-data-[collapsible=icon]/sidebar-wrapper:opacity-0 group-data-[collapsible=icon]/sidebar-wrapper:ml-0 ml-2">Login / Sign Up</span>
                 </Button>
             )}
         </SidebarFooter>
