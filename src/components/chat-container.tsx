@@ -3,6 +3,8 @@
 
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { Bot, User, Paperclip, SendHorizonal, Loader2, FileText, Settings, X, Trash2 } from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,6 +56,15 @@ interface ChatContainerProps {
     session: ChatSession;
     onSessionUpdate: (session: ChatSession) => void;
 }
+
+const CodeBlock = ({ language, value }: { language: string, value: string }) => {
+  return (
+    <SyntaxHighlighter language={language} style={atomDark}>
+      {value}
+    </SyntaxHighlighter>
+  );
+};
+
 
 export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) {
   const [messages, setMessages] = useState<Message[]>(session.messages);
@@ -192,6 +203,46 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     }
   };
 
+  const renderMessageContent = (message: Message) => {
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+  
+    while ((match = codeBlockRegex.exec(message.content)) !== null) {
+      // Add text before the code block
+      if (match.index > lastIndex) {
+        parts.push(
+          <p key={`${message.id}-text-${lastIndex}`} className="text-sm whitespace-pre-wrap">
+            {message.content.substring(lastIndex, match.index)}
+          </p>
+        );
+      }
+      
+      // Add the code block
+      const language = match[1] || 'text';
+      const code = match[2];
+      parts.push(
+        <div key={`${message.id}-code-${match.index}`} className="my-2 rounded-md overflow-hidden bg-[#2d2d2d]">
+          <CodeBlock language={language} value={code.trim()} />
+        </div>
+      );
+      
+      lastIndex = codeBlockRegex.lastIndex;
+    }
+  
+    // Add any remaining text after the last code block
+    if (lastIndex < message.content.length) {
+      parts.push(
+        <p key={`${message.id}-text-${lastIndex}`} className="text-sm whitespace-pre-wrap">
+          {message.content.substring(lastIndex)}
+        </p>
+      );
+    }
+  
+    return parts;
+  };
+
   return (
     <Card className="w-full max-w-3xl h-[85vh] flex flex-col shadow-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -263,7 +314,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                   message.role === 'system' ? 'bg-muted/50 text-muted-foreground italic text-sm' :
                   'bg-secondary'
                 }`}>
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                   {message.role === 'assistant' ? renderMessageContent(message) : <p className="text-sm whitespace-pre-wrap">{message.content}</p>}
                 </div>
                  {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">

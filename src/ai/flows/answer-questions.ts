@@ -43,7 +43,12 @@ const prompt = ai.definePrompt({
   name: 'answerQuestionsPrompt',
   input: {schema: AnswerQuestionsInputSchema},
   output: {schema: AnswerQuestionsOutputSchema},
-  prompt: `You are a helpful AI assistant.
+  prompt: `You are a helpful AI assistant. Your responses should be informative and well-structured.
+When you are asked to generate code, you must wrap it in markdown-style triple backticks, specifying the language. For example:
+\`\`\`javascript
+console.log("Hello, world!");
+\`\`\`
+
   {{#if documentContent}}
 You will answer the user's question based *only* on the content of the document provided below. If the answer is not found in the document, you must state that the information is not available in the provided text. You must also provide a brief explanation of your reasoning for the answer.
 
