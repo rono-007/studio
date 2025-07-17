@@ -274,19 +274,19 @@ export default function Home() {
             ))}
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter>
+        <SidebarFooter className="flex-col items-stretch group-data-[collapsible=icon]:items-center">
             {user ? (
                 <Button variant="ghost" className="w-full justify-start group-data-[collapsible=icon]:justify-center" onClick={handleLogout}>
-                    <LogOut className="mr-2" />
+                    <LogOut />
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Logout</span>
                 </Button>
             ) : (
                 <Button variant="ghost" className="w-full justify-start group-data-[collapsible=icon]:justify-center" onClick={() => router.push('/login')}>
-                    <LogIn className="mr-2" />
+                    <LogIn />
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Login / Sign Up</span>
                 </Button>
             )}
-            <SidebarTrigger className="ml-auto hidden md:flex" />
+            <SidebarTrigger className="hidden md:flex w-full group-data-[collapsible=icon]:ml-0 ml-auto" />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
