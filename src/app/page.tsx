@@ -28,7 +28,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
@@ -221,7 +220,7 @@ export default function Home() {
             <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">New Chat</span>
           </Button>
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className="p-2">
           <SidebarMenu>
             {sessions.map((session) => (
               <SidebarMenuItem key={session.id}>
@@ -286,11 +285,16 @@ export default function Home() {
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Login / Sign Up</span>
                 </Button>
             )}
-            <SidebarTrigger className="ml-auto" />
+            <SidebarTrigger className="ml-auto hidden md:flex" />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <div className="h-screen flex flex-col items-center p-0 md:p-4">
+        <div className="h-screen flex flex-col items-center">
+            <div className="md:hidden flex items-center justify-between w-full p-2 border-b">
+               <SidebarTrigger />
+               <h1 className="text-lg font-semibold">Infinitus</h1>
+               <div className="w-8"></div>
+            </div>
             <main className="flex-grow flex justify-center items-stretch w-full">
               {activeSession ? (
                   <ChatContainer
@@ -310,3 +314,5 @@ export default function Home() {
     </SidebarProvider>
   );
 }
+
+    
