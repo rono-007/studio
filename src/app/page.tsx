@@ -141,10 +141,12 @@ export default function Home({ params: {} }: { params: {} }) {
             if (newSessions.length > 0) {
                 setActiveSessionId(newSessions[0].id);
             } else {
+                // This case is hit when the last session is deleted
                 setActiveSessionId(null);
-                 createNewSession();
+                 createNewSession(); // create a new one to avoid empty state
             }
         }
+        // If after deletion, no sessions are left, create a fresh one.
         if (newSessions.length === 0) {
             createNewSession();
         }
@@ -178,19 +180,27 @@ export default function Home({ params: {} }: { params: {} }) {
 
   const handleLogout = async () => {
     try {
+      const uid = user?.uid; // Capture UID before signing out
       await signOut(auth);
+
+      // Clear all session data associated with the logged-out user and guests
+      if (uid) {
+        localStorage.removeItem(`infinitus_sessions_${uid}`);
+        localStorage.removeItem(`infinitus_active_session_id_${uid}`);
+      }
+      localStorage.removeItem(GUEST_SESSIONS_KEY);
+      localStorage.removeItem(ACTIVE_GUEST_SESSION_ID_KEY);
+      
+      // Reset component state
       setSessions([]);
       setActiveSessionId(null);
+
       toast({
           title: "Logged Out",
           description: "You have been successfully logged out.",
       });
-      // After logout, the user becomes a guest, so we need to initialize a new guest session.
-      const guestSessionsKey = GUEST_SESSIONS_KEY;
-      const guestActiveIdKey = ACTIVE_GUEST_SESSION_ID_KEY;
-      localStorage.removeItem(guestSessionsKey);
-      localStorage.removeItem(guestActiveIdKey);
       
+      // Redirect to login to force a clean state
       router.push('/login');
 
     } catch (error) {
