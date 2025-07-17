@@ -292,8 +292,7 @@ export default function Home() {
       <SidebarInset>
         <div className="flex flex-col h-screen">
             <header className="p-2 border-b flex items-center gap-2">
-              <SidebarTrigger className="md:hidden"/>
-              <SidebarTrigger className="hidden md:flex"/>
+              <SidebarTrigger/>
             </header>
             <main className="flex-grow flex items-center justify-center p-4">
               {activeSession ? (
