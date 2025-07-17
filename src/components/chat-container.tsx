@@ -14,12 +14,6 @@ import { parseDocument } from '@/ai/flows/parse-document';
 import { answerQuestions } from '@/ai/flows/answer-questions';
 import { useToast } from '@/hooks/use-toast';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -269,48 +263,38 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   return (
     <Card className="w-full max-w-3xl h-[85vh] flex flex-col shadow-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
-        <div className="w-8"></div> {/* Spacer to balance the settings icon */}
+        <div className="w-8"></div> {/* Spacer to balance the clear chat icon */}
         <CardTitle className="text-2xl font-bold flex items-center gap-2">
           <Bot className="text-primary" /> Infinitus
         </CardTitle>
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                    <Settings />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Clear Chat
-                    </DropdownMenuItem>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will clear all messages in this chat. This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => {
-                          onSessionUpdate(session.id, {
-                              messages: [{
-                                  id: 'init',
-                                  role: 'assistant',
-                                  content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
-                              }],
-                              document: null,
-                          })
-                      }}>Clear</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Trash2 />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will clear all messages in this chat. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => {
+                  onSessionUpdate(session.id, {
+                      messages: [{
+                          id: 'init',
+                          role: 'assistant',
+                          content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
+                      }],
+                      document: null,
+                  })
+              }}>Clear</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardHeader>
       <CardContent className="flex-grow overflow-hidden flex flex-col">
         {session.document && (
