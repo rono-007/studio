@@ -93,13 +93,15 @@ const ThinkingIndicator = () => (
 
 
 const models = {
-  "Advanced": [
-     { id: "googleai/gemini-1.5-pro-latest", name: "Gemini 1.5 Pro", description: "Most capable model for complex reasoning." },
+  "Text-out models": [
+    { id: "googleai/gemini-2.5-pro-preview-06-17", name: "Gemini 2.5 Pro", description: "Most capable model for complex reasoning." },
+    { id: "googleai/gemini-2.5-flash-preview-06-17", name: "Gemini 2.5 Flash", description: "Fast and capable model for general tasks." },
+    { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17", description: "The lightest and fastest model in the Gemini family." },
+    { id: "googleai/gemini-2.0-flash-preview-05-14", name: "Gemini 2.0 Flash", description: "A lighter-weight Gemini 2.0 model." },
+    { id: "googleai/gemini-2.0-flash-lite-preview-05-14", name: "Gemini 2.0 Flash-Lite", description: "The lightest and most efficient Gemini 2.0 model." },
   ],
-  "General": [
-    { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash", description: "Balanced speed and capability." },
-  ]
-}
+};
+
 
 const allModels = Object.values(models).flat();
 
@@ -108,7 +110,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
+  const [selectedModel, setSelectedModel] = useState("googleai/gemini-2.5-flash-lite-preview-06-17");
   
   const { user } = useAuth();
   const router = useRouter();
