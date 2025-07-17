@@ -291,10 +291,8 @@ export default function Home() {
       </Sidebar>
       <SidebarInset>
         <div className="h-screen flex flex-col items-stretch">
-            <div className="md:hidden flex items-center justify-between p-2 border-b shrink-0">
+            <div className="md:hidden flex items-center p-2 border-b shrink-0">
                <SidebarTrigger />
-               <h1 className="text-lg font-semibold">Infinitus</h1>
-               <div className="w-8"></div>
             </div>
             <main className="flex-grow flex justify-center items-stretch w-full min-h-0">
               {activeSession ? (
