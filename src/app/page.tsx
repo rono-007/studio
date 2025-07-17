@@ -61,7 +61,7 @@ export default function Home() {
     if (!isClient || loading) return;
 
     const sessionsKey = getSessionsKey();
-    const activeIdKey = getActiveSessionIdKey();
+    const activeIdKey = getActiveIdKey();
 
     try {
       const storedSessions = localStorage.getItem(sessionsKey);
@@ -276,12 +276,12 @@ export default function Home() {
         </SidebarContent>
         <SidebarFooter>
             {user ? (
-                <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
+                <Button variant="ghost" className="w-full justify-start group-data-[collapsible=icon]:justify-center" onClick={handleLogout}>
                     <LogOut className="mr-2" />
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Logout</span>
                 </Button>
             ) : (
-                <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/login')}>
+                <Button variant="ghost" className="w-full justify-start group-data-[collapsible=icon]:justify-center" onClick={() => router.push('/login')}>
                     <LogIn className="mr-2" />
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Login / Sign Up</span>
                 </Button>
