@@ -15,6 +15,7 @@ import {
   SidebarMenuAction,
   SidebarProvider,
   SidebarFooter,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -176,16 +177,29 @@ export default function Home() {
   }
 
   const handleLogout = async () => {
-    await signOut(auth);
-    setSessions([]);
-    setActiveSessionId(null);
-    toast({
-        title: "Logged Out",
-        description: "You have been successfully logged out.",
-    });
-    // After logout, the user becomes a guest, so we need to initialize a new guest session.
-    createNewSession();
-    router.push('/');
+    try {
+      await signOut(auth);
+      setSessions([]);
+      setActiveSessionId(null);
+      toast({
+          title: "Logged Out",
+          description: "You have been successfully logged out.",
+      });
+      // After logout, the user becomes a guest, so we need to initialize a new guest session.
+      const guestSessionsKey = GUEST_SESSIONS_KEY;
+      const guestActiveIdKey = ACTIVE_GUEST_SESSION_ID_KEY;
+      localStorage.removeItem(guestSessionsKey);
+      localStorage.removeItem(guestActiveIdKey);
+      
+      router.push('/login');
+
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Logout Failed",
+            description: "An error occurred during logout. Please try again.",
+        });
+    }
   };
 
   const activeSession = sessions.find(s => s.id === activeSessionId);
@@ -275,19 +289,24 @@ export default function Home() {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-         <div className="flex min-h-screen items-center justify-center p-4">
-            {activeSession ? (
-                <ChatContainer
-                    key={activeSession.id}
-                    session={activeSession}
-                    onSessionUpdate={updateSession}
-                />
-            ) : (
-                <div className="flex flex-col items-center justify-center h-full">
-                    <Bot size={48} className="text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">Select a chat or start a new one.</p>
-                </div>
-            )}
+        <div className="flex flex-col h-screen">
+            <header className="p-2 md:hidden">
+              <SidebarTrigger />
+            </header>
+            <main className="flex-grow flex items-center justify-center p-4">
+              {activeSession ? (
+                  <ChatContainer
+                      key={activeSession.id}
+                      session={activeSession}
+                      onSessionUpdate={updateSession}
+                  />
+              ) : (
+                  <div className="flex flex-col items-center justify-center h-full">
+                      <Bot size={48} className="text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">Select a chat or start a new one.</p>
+                  </div>
+              )}
+            </main>
         </div>
       </SidebarInset>
     </SidebarProvider>
