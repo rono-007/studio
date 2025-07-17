@@ -304,31 +304,31 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   };
 
   return (
-    <Card className="w-full h-full flex flex-col shadow-2xl border-none rounded-none md:rounded-lg md:border">
-      <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0">
-          <CardTitle className="w-full text-center text-2xl font-bold flex items-center justify-center gap-2">
-            <Bot className="text-primary" /> Infinitus
-          </CardTitle>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Trash2 />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will clear all messages in this chat. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={clearActiveChat}>Clear</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </CardHeader>
+    <Card className="w-full h-full flex flex-col shadow-none border-none rounded-none md:rounded-lg md:border">
+      <CardHeader className="flex flex-row items-center justify-between py-4 px-6 shrink-0">
+        <CardTitle className="w-full text-center text-2xl font-bold flex items-center justify-center gap-2">
+          <Bot className="text-primary" /> Infinitus
+        </CardTitle>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Trash2 />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will clear all messages in this chat. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={clearActiveChat}>Clear</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </CardHeader>
       <CardContent className="flex-grow p-6 min-h-0">
         <ScrollArea className="h-full pr-4" viewportRef={scrollAreaRef}>
           {session.document && (
