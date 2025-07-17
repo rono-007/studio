@@ -97,8 +97,6 @@ const models = {
     { id: "googleai/gemini-2.5-pro-preview-06-17", name: "Gemini 2.5 Pro", description: "Most capable model for complex reasoning." },
     { id: "googleai/gemini-2.5-flash-preview-06-17", name: "Gemini 2.5 Flash", description: "Fast and capable model for general tasks." },
     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17", description: "The lightest and fastest model in the Gemini family." },
-    { id: "googleai/gemini-2.0-flash-preview-05-14", name: "Gemini 2.0 Flash", description: "A lighter-weight Gemini 2.0 model." },
-    { id: "googleai/gemini-2.0-flash-lite-preview-05-14", name: "Gemini 2.0 Flash-Lite", description: "The lightest and most efficient Gemini 2.0 model." },
   ],
   "Embedding models": [
     { id: "googleai/text-embedding-004", name: "Gemini Embedding (text-embedding-004)", description: "Generates vector embeddings for text." },
