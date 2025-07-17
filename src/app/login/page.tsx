@@ -71,9 +71,7 @@ export default function LoginPage() {
       toast({
         variant: "destructive",
         title: "Signup Failed",
-        description: error.code === 'auth/email-already-in-use' 
-          ? "This email is already in use. Please use a different email or log in."
-          : (error.message || "An unexpected error occurred."),
+        description: error.message || "An unexpected error occurred.",
       });
     } finally {
       setIsLoading(false);
