@@ -304,7 +304,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   };
 
   return (
-    <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl">
+    <Card className="w-full h-full flex flex-col shadow-2xl border-none rounded-none md:rounded-lg md:border">
       <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0">
           <CardTitle className="w-full text-center text-2xl font-bold flex items-center justify-center gap-2">
             <Bot className="text-primary" /> Infinitus
@@ -329,8 +329,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             </AlertDialogContent>
           </AlertDialog>
         </CardHeader>
-      <CardContent className="p-6 flex-grow min-h-0">
-        <ScrollArea className="h-full pr-6" viewportRef={scrollAreaRef}>
+      <CardContent className="flex-grow p-6 min-h-0">
+        <ScrollArea className="h-full pr-4" viewportRef={scrollAreaRef}>
           {session.document && (
               <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10">
                   <div className="flex items-center gap-2">
@@ -409,7 +409,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             type="button"
             variant="outline"
             size="icon"
-            onClick={() => fileInput.current?.click()}
+            onClick={() => fileInputRef.current?.click()}
             aria-label="Upload document"
             disabled={isLoading || isGuestLimitReached}
           >
@@ -461,5 +461,3 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
-
-    

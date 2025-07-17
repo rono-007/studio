@@ -97,8 +97,8 @@ export default function LoginPage() {
 
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Card className="w-[400px]">
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+      <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>{activeTab === 'login' ? 'Welcome Back' : 'Create an Account'}</CardTitle>
           <CardDescription>
