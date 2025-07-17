@@ -216,9 +216,9 @@ export default function Home() {
     <SidebarProvider>
       <Sidebar side="left" collapsible="icon">
         <SidebarHeader>
-           <Button variant="ghost" className="w-full justify-start" onClick={createNewSession}>
-            <MessageSquarePlus className="mr-2" />
-            New Chat
+           <Button variant="ghost" className="w-full justify-start h-8" onClick={createNewSession}>
+            <MessageSquarePlus />
+            <span className="duration-200 transition-[width] ease-linear group-data-[collapsible=icon]/sidebar-wrapper:w-0 group-data-[collapsible=icon]/sidebar-wrapper:opacity-0 group-data-[collapsible=icon]/sidebar-wrapper:ml-0 ml-2">New Chat</span>
           </Button>
         </SidebarHeader>
         <SidebarContent>
