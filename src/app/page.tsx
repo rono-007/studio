@@ -28,7 +28,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
@@ -274,14 +273,14 @@ export default function Home() {
             ))}
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter className="flex-col items-stretch group-data-[collapsible=icon]:items-center">
+        <SidebarFooter className="flex flex-col items-stretch group-data-[collapsible=icon]:items-center">
             {user ? (
-                <Button variant="ghost" className="w-full justify-start group-data-[collapsible=icon]:justify-center" onClick={handleLogout}>
+                <Button variant="ghost" className="justify-start group-data-[collapsible=icon]:justify-center" onClick={handleLogout}>
                     <LogOut />
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Logout</span>
                 </Button>
             ) : (
-                <Button variant="ghost" className="w-full justify-start group-data-[collapsible=icon]:justify-center" onClick={() => router.push('/login')}>
+                <Button variant="ghost" className="justify-start group-data-[collapsible=icon]:justify-center" onClick={() => router.push('/login')}>
                     <LogIn />
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Login / Sign Up</span>
                 </Button>
