@@ -216,7 +216,7 @@ export default function Home({ params: {} }: { params: {} }) {
     <SidebarProvider>
       <Sidebar side="left" collapsible="icon">
         <SidebarHeader className="border-b">
-           <Button variant="ghost" className="w-full justify-start group-data-[collapsible=icon]:justify-center h-8" onClick={createNewSession}>
+           <Button variant="ghost" className="w-full justify-center h-8" onClick={createNewSession}>
             <MessageSquarePlus />
             <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">New Chat</span>
           </Button>
@@ -274,19 +274,19 @@ export default function Home({ params: {} }: { params: {} }) {
             ))}
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter className="flex flex-col items-stretch group-data-[collapsible=icon]:items-center">
+        <SidebarFooter className="flex flex-col items-center group-data-[collapsible=icon]:items-center">
             {user ? (
-                <Button variant="ghost" className="justify-start group-data-[collapsible=icon]:justify-center" onClick={handleLogout}>
+                <Button variant="ghost" className="justify-center" onClick={handleLogout}>
                     <LogOut />
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Logout</span>
                 </Button>
             ) : (
-                <Button variant="ghost" className="justify-start group-data-[collapsible=icon]:justify-center" onClick={() => router.push('/login')}>
+                <Button variant="ghost" className="justify-center" onClick={() => router.push('/login')}>
                     <LogIn />
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Login / Sign Up</span>
                 </Button>
             )}
-            <SidebarTrigger className="hidden md:flex w-full group-data-[collapsible=icon]:ml-0 ml-auto" />
+            <SidebarTrigger className="hidden md:flex w-full" />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
