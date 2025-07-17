@@ -27,7 +27,6 @@ const auth = getAuth(app);
 const signupSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
   email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
@@ -39,13 +38,17 @@ export default function SignupPage() {
 
   const signupForm = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: { name: "", email: "" },
   });
 
+  // A dummy password will be used since we are not asking the user for one.
+  // In a real-world scenario, you would implement a passwordless (e.g., magic link) flow.
   const handleSignup = async (data: SignupFormValues) => {
     setIsLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      // Using a dummy password for the backend requirement.
+      const dummyPassword = Math.random().toString(36).slice(-8);
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, dummyPassword);
       await updateProfile(userCredential.user, { displayName: data.name });
       await sendEmailVerification(userCredential.user);
       
@@ -87,11 +90,6 @@ export default function SignupPage() {
               <Label htmlFor="signup-email">Email</Label>
               <Input id="signup-email" {...signupForm.register("email")} placeholder="m@example.com" />
                {signupForm.formState.errors.email && <p className="text-destructive text-sm">{signupForm.formState.errors.email.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="signup-password">Password</Label>
-              <Input id="signup-password" type="password" {...signupForm.register("password")} />
-              {signupForm.formState.errors.password && <p className="text-destructive text-sm">{signupForm.formState.errors.password.message}</p>}
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
