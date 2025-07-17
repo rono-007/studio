@@ -287,12 +287,12 @@ export default function Home() {
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Login / Sign Up</span>
                 </Button>
             )}
+            <SidebarTrigger className="ml-auto" />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <div className="flex flex-col h-screen">
             <header className="p-2 border-b flex items-center gap-2">
-              <SidebarTrigger/>
             </header>
             <main className="flex-grow flex items-center justify-center p-4">
               {activeSession ? (
