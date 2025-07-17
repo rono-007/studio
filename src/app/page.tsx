@@ -35,9 +35,10 @@ import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
+import { SheetClose } from '@/components/ui/sheet';
 
-const GUEST_SESSIONS_KEY = 'parseai_guest_sessions';
-const ACTIVE_GUEST_SESSION_ID_KEY = 'parseai_active_guest_session_id';
+const GUEST_SESSIONS_KEY = 'infinitus_guest_sessions';
+const ACTIVE_GUEST_SESSION_ID_KEY = 'infinitus_active_guest_session_id';
 
 export default function Home() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -50,8 +51,8 @@ export default function Home() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const getSessionsKey = () => user ? `parseai_sessions_${user.uid}` : GUEST_SESSIONS_KEY;
-  const getActiveSessionIdKey = () => user ? `parseai_active_session_id_${user.uid}` : ACTIVE_GUEST_SESSION_ID_KEY;
+  const getSessionsKey = () => user ? `infinitus_sessions_${user.uid}` : GUEST_SESSIONS_KEY;
+  const getActiveSessionIdKey = () => user ? `infinitus_active_session_id_${user.uid}` : ACTIVE_GUEST_SESSION_ID_KEY;
 
   useEffect(() => {
     setIsClient(true);
@@ -287,11 +288,16 @@ export default function Home() {
                 </Button>
             )}
         </SidebarFooter>
+        <SheetClose>
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+        </SheetClose>
       </Sidebar>
       <SidebarInset>
         <div className="flex flex-col h-screen">
-            <header className="p-2 border-b">
-              <SidebarTrigger />
+            <header className="p-2 border-b flex items-center gap-2">
+              <SidebarTrigger className="md:hidden"/>
+              <SidebarTrigger className="hidden md:flex"/>
             </header>
             <main className="flex-grow flex items-center justify-center p-4">
               {activeSession ? (
