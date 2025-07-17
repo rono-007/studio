@@ -290,12 +290,12 @@ export default function Home({ params: {} }: { params: {} }) {
             {user ? (
                 <Button variant="ghost" className="w-full justify-center" onClick={handleLogout}>
                     <LogOut />
-                    <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Logout</span>
+                    <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">Logout</span>
                 </Button>
             ) : (
                 <Button variant="ghost" className="w-full justify-center" onClick={() => router.push('/login')}>
                     <LogIn />
-                    <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Login / Sign Up</span>
+                    <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">Login / Sign Up</span>
                 </Button>
             )}
             <SidebarTrigger className="hidden md:flex w-full" />
