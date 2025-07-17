@@ -67,16 +67,13 @@ const CodeBlock = ({ language, value }: { language: string, value: string }) => 
 };
 
 const models = {
-  "Conversations & Text": [
-    { id: "googleai/gemini-1.5-flash-latest", name: "gemini-1.5-flash-latest" },
-    { id: "googleai/gemini-2.0-flash", name: "gemini-2.0-flash" }
+  "General & Text": [
+    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash" },
+    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite" },
   ],
-  "Image Understanding": [
-    { id: "googleai/gemini-1.5-flash-latest", name: "gemini-1.5-flash-latest" }
-  ],
-  "Code & Bug Fixing": [
-    { id: "googleai/gemini-1.5-pro-latest", name: "gemini-1.5-pro-latest" },
-    { id: "googleai/gemini-2.5-pro", name: "gemini-2.5-pro" }
+  "Advanced & Code": [
+     { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro" },
+     { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash" },
   ]
 }
 
@@ -84,7 +81,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
+  const [selectedModel, setSelectedModel] = useState("googleai/gemini-2.0-flash");
   
   const { user } = useAuth();
   const router = useRouter();
@@ -458,5 +455,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
+
+    
 
     
