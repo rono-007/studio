@@ -167,10 +167,10 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     const userMessageContent = input.trim();
     if (!userMessageContent) return;
   
+    setInput('');
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
-    setInput('');
     setIsLoading(true);
     setLoadingMessage('Thinking...');
   
@@ -180,7 +180,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       const history = newMessages
         .filter(m => m.role === 'user' || m.role === 'assistant')
         .map(m => ({
-          role: m.role,
+          role: m.role as 'user' | 'assistant',
           content: m.content
         }));
   
@@ -193,7 +193,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch (error)
+ {
       console.error('Answering failed:', error);
       const errorMessage: Message = {
         id: Date.now().toString() + 'err',
