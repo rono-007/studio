@@ -512,7 +512,7 @@ const SidebarMenuItem = React.forwardRef<
   <li
     ref={ref}
     data-sidebar="menu-item"
-    className={cn("group/menu-item relative flex items-center", className)}
+    className={cn("group/menu-item relative flex items-center mt-1", className)}
     {...props}
   />
 ))
@@ -769,5 +769,3 @@ export {
   useSidebar,
   SheetClose
 }
-
-    
