@@ -6,8 +6,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
-import { app } from '@/lib/firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,8 +22,6 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
-
-const auth = getAuth(app);
 
 const signupSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),

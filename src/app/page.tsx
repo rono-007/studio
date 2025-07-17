@@ -31,8 +31,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
-import { getAuth, signOut } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
+import { auth } from '@/lib/firebase';
 
 const GUEST_SESSIONS_KEY = 'parseai_guest_sessions';
 const ACTIVE_GUEST_SESSION_ID_KEY = 'parseai_active_guest_session_id';
@@ -175,7 +176,6 @@ export default function Home() {
   }
 
   const handleLogout = async () => {
-    const auth = getAuth();
     await signOut(auth);
     setSessions([]);
     setActiveSessionId(null);
