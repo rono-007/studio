@@ -69,14 +69,14 @@ const CodeBlock = ({ language, value }: { language: string, value: string }) => 
 
 const models = {
   "Advanced": [
-     { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro", limit: 15 },
-     { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash", limit: 60 },
-     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17", limit: 60 },
+     { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro", limit: 100 },
+     { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash", limit: 250 },
+     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17", limit: 1000 },
   ],
   "General": [
-    { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash (Default)", limit: 60 },
-    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash", limit: 60 },
-    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite", limit: 60 },
+    { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash (Default)", limit: 250 },
+    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash", limit: 200 },
+    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite", limit: 200 },
   ]
 }
 
