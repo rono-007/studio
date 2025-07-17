@@ -82,7 +82,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState("googleai/gemini-2.5-flash");
+  const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
   
   const { user } = useAuth();
   const router = useRouter();
@@ -304,7 +304,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   };
 
   return (
-    <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl border-0">
+    <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl">
       <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0">
           <CardTitle className="w-full text-center text-2xl font-bold flex items-center justify-center gap-2">
             <Bot className="text-primary" /> Infinitus
@@ -409,7 +409,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             type="button"
             variant="outline"
             size="icon"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => fileInput.current?.click()}
             aria-label="Upload document"
             disabled={isLoading || isGuestLimitReached}
           >
@@ -461,3 +461,5 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
+
+    
