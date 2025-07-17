@@ -128,10 +128,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!user) {
-        const userMessagesCount = session.messages.filter(m => m.role === 'user').length;
-    }
-
     setIsLoading(true);
     setLoadingMessage('Parsing document...');
     
@@ -289,6 +285,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     return parts;
   };
 
+  const currentModelName = allModels.find(m => m.id === selectedModel)?.name || selectedModel;
+
   return (
     <Card className="w-full h-full flex flex-col shadow-none border-none rounded-none md:rounded-lg md:border">
       <CardHeader className="flex flex-row items-center justify-between py-4 px-6 shrink-0">
@@ -386,7 +384,13 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="pt-6 shrink-0">
+      <CardFooter className="pt-6 shrink-0 flex flex-col gap-2">
+        <div
+            key={selectedModel}
+            className="text-center text-xs text-muted-foreground font-mono animate-in fade-in zoom-in-95"
+        >
+            Using: <span className="font-semibold text-foreground">{currentModelName}</span>
+        </div>
         <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
             <input
                 type="file"
