@@ -41,13 +41,24 @@ export function ChatContainer() {
       }
       const storedMessages = localStorage.getItem('parseai_messages');
       if (storedMessages) {
-        setMessages(JSON.parse(storedMessages));
+        const parsedMessages = JSON.parse(storedMessages);
+        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
+            setMessages(parsedMessages);
+        } else {
+             setMessages([
+              {
+                id: 'init',
+                role: 'assistant',
+                content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
+              },
+            ]);
+        }
       } else {
         setMessages([
           {
             id: 'init',
             role: 'assistant',
-            content: 'Hello! Upload a document to get started.',
+            content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
           },
         ]);
       }
@@ -57,7 +68,7 @@ export function ChatContainer() {
         {
           id: 'init-error',
           role: 'assistant',
-          content: 'Hello! Upload a document to get started.',
+          content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
         },
       ]);
     }
@@ -142,7 +153,7 @@ export function ChatContainer() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || !documentState) return;
+    if (!input.trim()) return;
 
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
@@ -153,7 +164,7 @@ export function ChatContainer() {
     try {
       const { answer } = await answerQuestions({
         question: input,
-        documentContent: documentState.content,
+        documentContent: documentState?.content,
       });
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
       setMessages((prev) => [...prev, assistantMessage]);
@@ -244,11 +255,11 @@ export function ChatContainer() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={documentState ? `Ask about ${documentState.name}...` : "Upload a document to start"}
-            disabled={isLoading || !documentState}
+            placeholder={documentState ? `Ask about ${documentState.name}...` : "Ask a question..."}
+            disabled={isLoading}
             autoComplete="off"
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || !documentState} aria-label="Send message">
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim()} aria-label="Send message">
             <SendHorizonal className="h-5 w-5" />
           </Button>
         </form>
