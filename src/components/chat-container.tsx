@@ -162,7 +162,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     setLoadingMessage('Thinking...');
 
     try {
-      const isImage = documentState?.dataUri.startsWith('data:image');
+      const isImage = documentState?.dataUri?.startsWith('data:image');
       const { answer } = await answerQuestions({
         question: input,
         documentContent: documentState && !isImage ? documentState.content : undefined,
@@ -170,7 +170,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       });
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
       setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch (error)
+ {
       console.error('Answering failed:', error);
       const errorMessage: Message = {
         id: Date.now().toString() + 'err',
