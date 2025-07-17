@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut, PanelLeft } from 'lucide-react';
+import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut, PanelLeft, X } from 'lucide-react';
 import { ChatContainer, type ChatSession } from '@/components/chat-container';
 import {
   Sidebar,
