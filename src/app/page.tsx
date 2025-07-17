@@ -184,6 +184,7 @@ export default function Home() {
                   />
                 ) : (
                   <SidebarMenuButton
+                    variant="ghost"
                     onClick={() => setActiveSessionId(session.id)}
                     isActive={session.id === activeSessionId}
                     className="truncate"
