@@ -239,7 +239,7 @@ export default function Home({ params: {} }: { params: {} }) {
                     variant="ghost"
                     onClick={() => setActiveSessionId(session.id)}
                     isActive={session.id === activeSessionId}
-                    className="truncate justify-start"
+                    className="truncate justify-center"
                   >
                     {session.title}
                   </SidebarMenuButton>
