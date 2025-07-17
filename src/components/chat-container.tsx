@@ -168,40 +168,49 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     if (!userMessageContent) return;
 
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    
+    // Use a state updater function to get the most recent state
+    setMessages(prevMessages => {
+      const newMessages = [...prevMessages, userMessage];
+      
+      // Perform the AI call inside the updater to ensure `newMessages` is current
+      (async () => {
+        try {
+          const isImage = documentState?.dataUri?.startsWith('data:image');
+          
+          const history = newMessages.filter(m => m.role === 'user' || m.role === 'assistant').map(m => ({
+              role: m.role,
+              content: m.content
+          }));
+
+          const { answer } = await answerQuestions({
+            question: userMessageContent,
+            history: history.slice(0, -1), // Don't include the current question in history
+            documentContent: documentState && !isImage ? documentState.content : undefined,
+            imageDataUri: documentState && isImage ? documentState.dataUri : undefined,
+          });
+          const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
+          setMessages(prev => [...prev, assistantMessage]);
+        } catch (error) {
+          console.error('Answering failed:', error);
+          const errorMessage: Message = {
+            id: Date.now().toString() + 'err',
+            role: 'assistant',
+            content: "Sorry, I encountered an error while trying to answer. Please try again.",
+          };
+          setMessages(prev => [...prev, errorMessage]);
+        } finally {
+          setIsLoading(false);
+          setLoadingMessage('');
+        }
+      })();
+      
+      return newMessages;
+    });
+
     setInput('');
     setIsLoading(true);
     setLoadingMessage('Thinking...');
-
-    try {
-      const isImage = documentState?.dataUri?.startsWith('data:image');
-      
-      const history = newMessages.filter(m => m.role === 'user' || m.role === 'assistant').map(m => ({
-          role: m.role,
-          content: m.content
-      }));
-
-      const { answer } = await answerQuestions({
-        question: userMessageContent,
-        history: history.slice(0, -1), // Don't include the current question in history
-        documentContent: documentState && !isImage ? documentState.content : undefined,
-        imageDataUri: documentState && isImage ? documentState.dataUri : undefined,
-      });
-      const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Answering failed:', error);
-      const errorMessage: Message = {
-        id: Date.now().toString() + 'err',
-        role: 'assistant',
-        content: "Sorry, I encountered an error while trying to answer. Please try again.",
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-      setLoadingMessage('');
-    }
   };
 
   const renderMessageContent = (message: Message) => {
