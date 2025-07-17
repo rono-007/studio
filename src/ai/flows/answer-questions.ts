@@ -26,7 +26,7 @@ const AnswerQuestionsInputSchema = z.object({
     .string()
     .optional()
     .describe(
-      "An image as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'.",
+      "An image as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
 export type AnswerQuestionsInput = z.infer<typeof AnswerQuestionsInputSchema>;
@@ -84,7 +84,7 @@ const answerQuestionsFlow = ai.defineFlow(
     outputSchema: AnswerQuestionsOutputSchema,
   },
   async (input) => {
-    const model = input.model ? ai.model(input.model) : undefined;
+    const model = input.model;
     
     const {output} = await prompt(input, {model});
     return output!;
