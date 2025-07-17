@@ -39,7 +39,7 @@ import { auth } from '@/lib/firebase';
 const GUEST_SESSIONS_KEY = 'infinitus_guest_sessions';
 const ACTIVE_GUEST_SESSION_ID_KEY = 'infinitus_active_guest_session_id';
 
-export default function Home() {
+export default function Home({ params: {} }: { params: {} }) {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
