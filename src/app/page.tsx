@@ -239,7 +239,7 @@ export default function Home() {
                     variant="ghost"
                     onClick={() => setActiveSessionId(session.id)}
                     isActive={session.id === activeSessionId}
-                    className="truncate"
+                    className="truncate data-[active=true]:bg-transparent data-[active=true]:border data-[active=true]:border-white"
                   >
                     {session.title}
                   </SidebarMenuButton>
