@@ -1,30 +1,62 @@
+
 "use client";
 
 import { useState, useEffect, useRef, type FormEvent } from 'react';
-import { Bot, User, Paperclip, SendHorizonal, Loader2, FileText } from 'lucide-react';
+import { Bot, User, Paperclip, SendHorizonal, Loader2, FileText, Settings, X, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { parseDocument } from '@/ai/flows/parse-document';
 import { answerQuestions } from '@/ai/flows/answer-questions';
 import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
-type Message = {
+
+export type Message = {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
 };
 
-type DocumentState = {
+export type DocumentState = {
   name: string;
   content: string;
 } | null;
 
-export function ChatContainer() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [documentState, setDocumentState] = useState<DocumentState>(null);
+
+export type ChatSession = {
+    id: string;
+    title: string;
+    messages: Message[];
+    document: DocumentState;
+}
+
+interface ChatContainerProps {
+    session: ChatSession;
+    onSessionUpdate: (session: ChatSession) => void;
+}
+
+export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) {
+  const [messages, setMessages] = useState<Message[]>(session.messages);
+  const [documentState, setDocumentState] = useState<DocumentState>(session.document);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
@@ -34,57 +66,18 @@ export function ChatContainer() {
   const { toast } = useToast();
 
   useEffect(() => {
-    try {
-      const storedDoc = localStorage.getItem('parseai_document');
-      if (storedDoc) {
-        setDocumentState(JSON.parse(storedDoc));
-      }
-      const storedMessages = localStorage.getItem('parseai_messages');
-      if (storedMessages) {
-        const parsedMessages = JSON.parse(storedMessages);
-        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
-            setMessages(parsedMessages);
-        } else {
-             setMessages([
-              {
-                id: 'init',
-                role: 'assistant',
-                content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
-              },
-            ]);
+    let title = session.title;
+    if(title === 'New Chat' && messages.length > 1) {
+        const firstUserMessage = messages.find(m => m.role === 'user');
+        if (firstUserMessage) {
+            title = firstUserMessage.content.substring(0, 30) + (firstUserMessage.content.length > 30 ? '...' : '');
         }
-      } else {
-        setMessages([
-          {
-            id: 'init',
-            role: 'assistant',
-            content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
-          },
-        ]);
-      }
-    } catch (error) {
-      console.error("Failed to load from localStorage", error);
-      setMessages([
-        {
-          id: 'init-error',
-          role: 'assistant',
-          content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
-        },
-      ]);
+    } else if (documentState && title === 'New Chat') {
+        title = documentState.name;
     }
-  }, []);
-
-  useEffect(() => {
-    try {
-      if (messages.length) {
-        localStorage.setItem('parseai_messages', JSON.stringify(messages));
-      }
-      if (documentState) {
-        localStorage.setItem('parseai_document', JSON.stringify(documentState));
-      }
-    } catch (error) {
-       console.error("Failed to save to localStorage", error);
-    }
+    
+    const updatedSession: ChatSession = { ...session, messages, document: documentState, title };
+    onSessionUpdate(updatedSession);
   }, [messages, documentState]);
   
   useEffect(() => {
@@ -103,10 +96,6 @@ export function ChatContainer() {
     setIsLoading(true);
     setLoadingMessage('Parsing document...');
     
-    // Reset chat history for new document
-    const initialMessages: Message[] = [];
-    setMessages(initialMessages);
-
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = async () => {
@@ -114,15 +103,16 @@ export function ChatContainer() {
         const dataUri = reader.result as string;
         const { parsedText } = await parseDocument({ documentDataUri: dataUri });
         
-        setDocumentState({ name: file.name, content: parsedText });
-        setMessages([
-          ...initialMessages,
-          {
+        const newDocState = { name: file.name, content: parsedText };
+        setDocumentState(newDocState);
+
+        const systemMessage: Message = {
             id: Date.now().toString(),
             role: 'system',
             content: `Successfully parsed "${file.name}". You can now ask questions about it.`,
-          },
-        ]);
+        };
+        setMessages(prev => [...prev, systemMessage]);
+
       } catch (error) {
         console.error('Parsing failed:', error);
         toast({
@@ -130,10 +120,8 @@ export function ChatContainer() {
           title: 'Parsing Failed',
           description: 'Could not parse the document. Please try another file.',
         });
-        setMessages([
-            ...initialMessages,
-            { id: Date.now().toString(), role: 'assistant', content: "Sorry, I couldn't read that document. Please try another one." }
-        ]);
+        const errorMessage: Message = { id: Date.now().toString(), role: 'assistant', content: "Sorry, I couldn't read that document. Please try another one." };
+        setMessages(prev => [...prev, errorMessage]);
       } finally {
         setIsLoading(false);
         setLoadingMessage('');
@@ -150,6 +138,17 @@ export function ChatContainer() {
         setLoadingMessage('');
     }
   };
+
+  const removeDocument = () => {
+      const docName = documentState?.name;
+      setDocumentState(null);
+      const systemMessage: Message = {
+        id: Date.now().toString(),
+        role: 'system',
+        content: `Removed document "${docName}". The conversation will now be based on general knowledge.`,
+      };
+      setMessages(prev => [...prev, systemMessage]);
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -184,13 +183,60 @@ export function ChatContainer() {
 
   return (
     <Card className="w-full max-w-3xl h-[85vh] flex flex-col shadow-2xl">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-2xl font-bold flex items-center gap-2">
           <Bot className="text-primary" /> ParseAI
         </CardTitle>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <Settings />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                 <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Clear Chat
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will clear all messages in this chat. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => {
+                          setMessages([{
+                              id: 'init',
+                              role: 'assistant',
+                              content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
+                          }]);
+                          setDocumentState(null);
+                      }}>Clear</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+            </DropdownMenuContent>
+        </DropdownMenu>
       </CardHeader>
-      <CardContent className="flex-grow overflow-hidden">
-        <ScrollArea className="h-full pr-4" viewportRef={scrollViewportRef}>
+      <CardContent className="flex-grow overflow-hidden flex flex-col">
+        {documentState && (
+            <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary" />
+                    <span className="font-medium">{documentState.name}</span>
+                </div>
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removeDocument}>
+                    <X className="h-4 w-4" />
+                </Button>
+            </div>
+        )}
+        <ScrollArea className="h-full pr-4 flex-grow" viewportRef={scrollViewportRef}>
           <div className="space-y-6">
             {messages.map((message) => (
               <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
