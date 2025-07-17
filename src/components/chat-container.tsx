@@ -94,14 +94,12 @@ const ThinkingIndicator = () => (
 
 const models = {
   "Advanced": [
-     { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro", description: "Most capable model for complex reasoning." },
-     { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash", description: "Fast and powerful for mixed media." },
+     { id: "googleai/gemini-1.5-pro-latest", name: "Gemini 1.5 Pro", description: "Most capable model for complex reasoning." },
      { id: "googleai/gemma-2-27b-it", name: "Gemma 2 27B", description: "Most capable Gemma model for complex tasks." },
      { id: "googleai/gemma-2-9b-it", name: "Gemma 2 9B (Default)", description: "Balanced performance and capability." },
   ],
   "General": [
     { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash", description: "Balanced speed and capability." },
-    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash", description: "A solid and reliable general-purpose model." },
   ]
 }
 
