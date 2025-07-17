@@ -90,11 +90,19 @@ const answerQuestionsFlow = ai.defineFlow(
       const {output} = await prompt(input, {model});
       return output!;
     } catch (e: any) {
-      if (e.message && e.message.includes('[429 Too Many Requests]')) {
-        return {
-          answer: `I'm sorry, but I've hit the request limit for the selected model (\`${input.model}\`). Please try again in a little while, or select a different model from the settings.`,
-          reasoning: 'API rate limit exceeded.',
-        };
+      if (e.message) {
+        if (e.message.includes('[429 Too Many Requests]')) {
+          return {
+            answer: `I'm sorry, but I've hit the request limit for the selected model (\`${input.model}\`). Please try again in a little while, or select a different model from the settings.`,
+            reasoning: 'API rate limit exceeded.',
+          };
+        }
+        if (e.message.includes('[503 Service Unavailable]')) {
+           return {
+            answer: `I'm sorry, but the selected model (\`${input.model}\`) is currently overloaded. Please try again in a moment, or select a different model.`,
+            reasoning: 'Model service unavailable.',
+          };
+        }
       }
       // Re-throw other errors
       throw e;
