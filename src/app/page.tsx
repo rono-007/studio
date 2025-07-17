@@ -35,7 +35,6 @@ import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
-import { SheetClose } from '@/components/ui/sheet';
 
 const GUEST_SESSIONS_KEY = 'infinitus_guest_sessions';
 const ACTIVE_GUEST_SESSION_ID_KEY = 'infinitus_active_guest_session_id';
@@ -288,10 +287,6 @@ export default function Home() {
                 </Button>
             )}
         </SidebarFooter>
-        <SheetClose>
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-        </SheetClose>
       </Sidebar>
       <SidebarInset>
         <div className="flex flex-col h-screen">
