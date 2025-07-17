@@ -269,7 +269,7 @@ export default function Home() {
             ) : (
                 <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/login')}>
                     <LogIn className="mr-2" />
-                    Sign Up
+                    Login / Sign Up
                 </Button>
             )}
         </SidebarFooter>
