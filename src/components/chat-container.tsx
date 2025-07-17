@@ -142,16 +142,7 @@ export function ChatContainer() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
-
-    if (!documentState) {
-      toast({
-        variant: 'destructive',
-        title: 'No document uploaded',
-        description: 'Please upload a document before asking questions.',
-      });
-      return;
-    }
+    if (!input.trim() || !documentState) return;
 
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
@@ -246,6 +237,7 @@ export function ChatContainer() {
             size="icon"
             onClick={() => fileInputRef.current?.click()}
             aria-label="Upload document"
+            disabled={isLoading}
           >
             <Paperclip className="h-5 w-5" />
           </Button>
@@ -253,10 +245,10 @@ export function ChatContainer() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={documentState ? `Ask about ${documentState.name}...` : "Upload a document to start"}
-            disabled={isLoading}
+            disabled={isLoading || !documentState}
             autoComplete="off"
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim()} aria-label="Send message">
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || !documentState} aria-label="Send message">
             <SendHorizonal className="h-5 w-5" />
           </Button>
         </form>
