@@ -164,9 +164,10 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    const userMessageContent = input.trim();
+    if (!userMessageContent) return;
 
-    const userMessage: Message = { id: Date.now().toString(), role: 'user', content: input };
+    const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
@@ -182,7 +183,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       }));
 
       const { answer } = await answerQuestions({
-        question: input,
+        question: userMessageContent,
         history: history.slice(0, -1), // Don't include the current question in history
         documentContent: documentState && !isImage ? documentState.content : undefined,
         imageDataUri: documentState && isImage ? documentState.dataUri : undefined,
