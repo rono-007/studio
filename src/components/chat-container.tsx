@@ -67,12 +67,12 @@ const CodeBlock = ({ language, value }: { language: string, value: string }) => 
 };
 
 const models = {
-  "Advanced & Code": [
+  "Advanced": [
      { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro" },
      { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash" },
      { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17" },
   ],
-  "General & Text": [
+  "General": [
     { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash" },
     { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite" },
   ]
@@ -82,7 +82,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
+  const [selectedModel, setSelectedModel] = useState("googleai/gemini-2.5-flash");
   
   const { user } = useAuth();
   const router = useRouter();
@@ -304,8 +304,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   };
 
   return (
-    <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl">
-      <CardHeader className="flex flex-row items-center py-4 px-6">
+    <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl border-0">
+      <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0">
           <CardTitle className="w-full text-center text-2xl font-bold flex items-center justify-center gap-2">
             <Bot className="text-primary" /> Infinitus
           </CardTitle>
@@ -329,19 +329,19 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             </AlertDialogContent>
           </AlertDialog>
         </CardHeader>
-      <CardContent className="flex-grow p-6 pt-0 flex flex-col overflow-y-auto">
-        {session.document && (
-            <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-primary" />
-                    <span className="font-medium">{session.document.name}</span>
-                </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removeDocument}>
-                    <X className="h-4 w-4" />
-                </Button>
-            </div>
-        )}
-        <ScrollArea className="flex-grow" viewportRef={scrollAreaRef}>
+      <CardContent className="p-6 pt-0 flex-grow min-h-0">
+        <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
+          {session.document && (
+              <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10">
+                  <div className="flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-primary" />
+                      <span className="font-medium">{session.document.name}</span>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removeDocument}>
+                      <X className="h-4 w-4" />
+                  </Button>
+              </div>
+          )}
            <div className="space-y-6 pr-6">
             {session.messages.map((message) => (
               <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
@@ -396,7 +396,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="pt-6">
+      <CardFooter className="pt-6 shrink-0">
         <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
             <input
                 type="file"
