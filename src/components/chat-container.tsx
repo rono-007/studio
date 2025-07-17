@@ -88,16 +88,16 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const router = useRouter();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const scrollViewportRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const userMessagesCount = session.messages.filter(m => m.role === 'user').length;
   const isGuestLimitReached = !user && userMessagesCount >= GUEST_MESSAGE_LIMIT;
 
   useEffect(() => {
-    if (scrollViewportRef.current) {
-      scrollViewportRef.current.scrollTo({
-        top: scrollViewportRef.current.scrollHeight,
+    if (scrollAreaRef.current) {
+        scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
         behavior: 'smooth',
       });
     }
@@ -341,8 +341,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                 </Button>
             </div>
         )}
-        <ScrollArea className="flex-grow pr-4 -mr-4">
-          <div className="space-y-6">
+        <ScrollArea className="flex-grow" viewportRef={scrollAreaRef}>
+           <div className="space-y-6 pr-6">
             {session.messages.map((message) => (
               <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
                 {message.role !== 'user' && (
