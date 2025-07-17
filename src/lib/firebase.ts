@@ -1,16 +1,15 @@
-import { initializeApp, getApps, getApp, type FirebaseOptions } from "firebase/app";
+import { initializeApp, getApps, getApp, FirebaseOptions } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig: FirebaseOptions = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyDBMVaItQ3hq7bg0vSqo6esmHEBf91lcb0",
+  authDomain: "aichatbot-3b57f.firebaseapp.com",
+  projectId: "aichatbot-3b57f",
+  storageBucket: "aichatbot-3b57f.firebasestorage.app",
+  messagingSenderId: "880096623731",
+  appId: "1:880096623731:web:0b0207375339997b423e06"
 };
 
-// Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 
