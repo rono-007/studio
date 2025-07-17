@@ -30,7 +30,7 @@ export function ChatContainer() {
   const [loadingMessage, setLoadingMessage] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollViewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -88,9 +88,9 @@ export function ChatContainer() {
   }, [messages, documentState]);
   
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({
-        top: scrollAreaRef.current.scrollHeight,
+    if (scrollViewportRef.current) {
+      scrollViewportRef.current.scrollTo({
+        top: scrollViewportRef.current.scrollHeight,
         behavior: 'smooth',
       });
     }
@@ -190,7 +190,7 @@ export function ChatContainer() {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-grow overflow-hidden">
-        <ScrollArea className="h-full pr-4" viewportRef={scrollAreaRef}>
+        <ScrollArea className="h-full pr-4" viewportRef={scrollViewportRef}>
           <div className="space-y-6">
             {messages.map((message) => (
               <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
