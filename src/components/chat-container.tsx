@@ -107,6 +107,7 @@ const models = {
 
 
 const allModels = Object.values(models).flat();
+const textGenerationModels = models["Text-out models"];
 
 
 export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) {
@@ -216,6 +217,15 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     e.preventDefault();
     const userMessageContent = input.trim();
     if (!userMessageContent) return;
+
+    if (!textGenerationModels.some(m => m.id === selectedModel)) {
+      toast({
+        variant: "destructive",
+        title: "Incompatible Model",
+        description: `The selected model (${allModels.find(m => m.id === selectedModel)?.name || 'Unknown'}) cannot be used for generating chat responses. Please select a model from the "Text-out models" category.`,
+      });
+      return;
+    }
 
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
     const updatedMessages = [...session.messages, userMessage];
