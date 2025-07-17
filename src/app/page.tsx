@@ -294,7 +294,7 @@ export default function Home({ params: {} }: { params: {} }) {
       </Sidebar>
       <SidebarInset>
         <div className="h-screen flex flex-col items-stretch">
-            <div className="md:hidden flex items-center p-2 border-b shrink-0">
+            <div className="md:hidden flex items-center p-2 border-b shrink-0 bg-card">
                <SidebarTrigger />
             </div>
             <main className="flex-grow flex justify-center items-stretch w-full min-h-0">
