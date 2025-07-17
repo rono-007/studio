@@ -61,7 +61,7 @@ export default function LoginPage() {
       
       toast({
         title: "Signup Successful",
-        description: "Welcome! You are now logged in.",
+        description: "Welcome! Redirecting to your dashboard.",
       });
       router.push('/');
     } catch (error: any) {
@@ -81,7 +81,7 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, data.email, data.password);
       toast({
         title: "Login Successful",
-        description: "Welcome back!",
+        description: "Welcome back! Redirecting...",
       });
       router.push('/');
     } catch (error: any) {
@@ -98,7 +98,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md mx-auto">
         <CardHeader>
           <CardTitle>{activeTab === 'login' ? 'Welcome Back' : 'Create an Account'}</CardTitle>
           <CardDescription>
