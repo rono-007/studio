@@ -96,12 +96,12 @@ const models = {
   "Advanced": [
      { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro", description: "Most capable model for complex reasoning." },
      { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash", description: "Fast and powerful for mixed media." },
-     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17", description: "The very latest lightweight preview model." },
+     { id: "googleai/gemma-2-27b-it", name: "Gemma 2 27B", description: "Most capable Gemma model for complex tasks." },
+     { id: "googleai/gemma-2-9b-it", name: "Gemma 2 9B (Default)", description: "Balanced performance and capability." },
   ],
   "General": [
-    { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash (Default)", description: "Balanced speed and capability." },
+    { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash", description: "Balanced speed and capability." },
     { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash", description: "A solid and reliable general-purpose model." },
-    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite", description: "Fastest and most efficient for simple tasks." },
   ]
 }
 
@@ -112,7 +112,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
+  const [selectedModel, setSelectedModel] = useState("googleai/gemma-2-9b-it");
   
   const { user } = useAuth();
   const router = useRouter();
