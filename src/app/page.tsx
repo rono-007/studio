@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut, PanelLeft, X } from 'lucide-react';
+import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut, PanelLeft } from 'lucide-react';
 import { ChatContainer, type ChatSession } from '@/components/chat-container';
 import {
   Sidebar,
@@ -16,7 +16,6 @@ import {
   SidebarProvider,
   SidebarFooter,
   SidebarTrigger,
-  SheetClose
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -240,7 +239,7 @@ export default function Home() {
                     variant="ghost"
                     onClick={() => setActiveSessionId(session.id)}
                     isActive={session.id === activeSessionId}
-                    className="truncate justify-center data-[active=true]:bg-transparent data-[active=true]:border data-[active=true]:border-white"
+                    className="truncate justify-center data-[active=true]:bg-transparent"
                   >
                     {session.title}
                   </SidebarMenuButton>
