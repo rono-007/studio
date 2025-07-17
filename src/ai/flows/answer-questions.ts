@@ -62,11 +62,7 @@ You will answer the user's question from your general knowledge.
 {{#if history}}
 Here is the conversation history:
 {{#each history}}
-{{#if (eq this.role "user")}}
-User: {{{this.content}}}
-{{else}}
-Assistant: {{{this.content}}}
-{{/if}}
+{{this.role}}: {{{this.content}}}
 {{/each}}
 {{/if}}
 
