@@ -11,14 +11,20 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+const HistoryItemSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string(),
+});
+
 const AnswerQuestionsInputSchema = z.object({
   question: z.string().describe('The question to answer.'),
+  history: z.array(HistoryItemSchema).optional().describe('The history of the conversation.'),
   documentContent: z.string().optional().describe('The content of the document to answer the question from.'),
   imageDataUri: z
     .string()
     .optional()
     .describe(
-      "An image as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "An image as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'.",
     ),
 });
 export type AnswerQuestionsInput = z.infer<typeof AnswerQuestionsInputSchema>;
@@ -53,6 +59,17 @@ Image:
 You will answer the user's question from your general knowledge.
   {{/if}}
 
+{{#if history}}
+Here is the conversation history:
+{{#each history}}
+{{#if (eq this.role "user")}}
+User: {{{this.content}}}
+{{else}}
+Assistant: {{{this.content}}}
+{{/if}}
+{{/each}}
+{{/if}}
+
 Question: {{{question}}}
 `,
 });
@@ -66,5 +83,5 @@ const answerQuestionsFlow = ai.defineFlow(
   async input => {
     const {output} = await prompt(input);
     return output!;
-  }
+  },
 );

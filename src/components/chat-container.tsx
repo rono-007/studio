@@ -156,22 +156,29 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     if (!input.trim()) return;
 
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput('');
     setIsLoading(true);
     setLoadingMessage('Thinking...');
 
     try {
       const isImage = documentState?.dataUri?.startsWith('data:image');
+      
+      const history = newMessages.filter(m => m.role === 'user' || m.role === 'assistant').map(m => ({
+          role: m.role,
+          content: m.content
+      }));
+
       const { answer } = await answerQuestions({
         question: input,
+        history: history.slice(0, -1), // Don't include the current question in history
         documentContent: documentState && !isImage ? documentState.content : undefined,
         imageDataUri: documentState && isImage ? documentState.dataUri : undefined,
       });
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
       setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error)
- {
+    } catch (error) {
       console.error('Answering failed:', error);
       const errorMessage: Message = {
         id: Date.now().toString() + 'err',
