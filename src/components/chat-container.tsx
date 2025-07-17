@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef, type FormEvent } from 'react';
-import { Bot, User, Paperclip, SendHorizonal, Loader2, FileText, Settings, X, Trash2 } from 'lucide-react';
+import { Bot, User, Paperclip, SendHorizonal, Loader2, FileText, Settings, X, Trash2, LogIn } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,9 +28,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from 'next/navigation';
 
 export type Message = {
   id: string;
@@ -57,6 +57,8 @@ interface ChatContainerProps {
     onSessionUpdate: (sessionId: string, updates: Partial<ChatSession>) => void;
 }
 
+const GUEST_MESSAGE_LIMIT = 5;
+
 const CodeBlock = ({ language, value }: { language: string, value: string }) => {
   return (
     <SyntaxHighlighter language={language} style={atomDark}>
@@ -70,12 +72,19 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
+  
+  const { user } = useAuth();
+  const router = useRouter();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const { messages, document: documentState } = session;
+
+  const userMessagesCount = messages.filter(m => m.role === 'user').length;
+  const isGuestLimitReached = !user && userMessagesCount >= GUEST_MESSAGE_LIMIT;
+
 
   useEffect(() => {
     if (scrollViewportRef.current) {
@@ -89,6 +98,15 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    if(isGuestLimitReached) {
+        toast({
+            variant: "destructive",
+            title: "Message limit reached",
+            description: "Please log in or sign up to continue.",
+        });
+        return;
+    }
 
     setIsLoading(true);
     setLoadingMessage('Parsing document...');
@@ -156,17 +174,26 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     e.preventDefault();
     const userMessageContent = input.trim();
     if (!userMessageContent) return;
-  
-    setInput('');
-    const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
-    const newMessages = [...messages, userMessage];
 
+    if(isGuestLimitReached) {
+        toast({
+            variant: "destructive",
+            title: "Message limit reached",
+            description: "Please log in or sign up to continue.",
+        });
+        return;
+    }
+  
+    const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
+    
     let title = session.title;
-    if (title === 'New Chat') {
+    if (title === 'New Chat' && userMessageContent.length > 0) {
       title = userMessageContent.substring(0, 30) + (userMessageContent.length > 30 ? '...' : '');
     }
 
+    const newMessages = [...messages, userMessage];
     onSessionUpdate(session.id, { messages: newMessages, title });
+    setInput('');
 
     setIsLoading(true);
     setLoadingMessage('Thinking...');
@@ -211,7 +238,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     let match;
   
     while ((match = codeBlockRegex.exec(message.content)) !== null) {
-      // Add text before the code block
       if (match.index > lastIndex) {
         parts.push(
           <p key={`${message.id}-text-${lastIndex}`} className="text-sm whitespace-pre-wrap">
@@ -220,7 +246,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         );
       }
       
-      // Add the code block
       const language = match[1] || 'text';
       const code = match[2];
       parts.push(
@@ -232,7 +257,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       lastIndex = codeBlockRegex.lastIndex;
     }
   
-    // Add any remaining text after the last code block
     if (lastIndex < message.content.length) {
       parts.push(
         <p key={`${message.id}-text-${lastIndex}`} className="text-sm whitespace-pre-wrap">
@@ -328,6 +352,18 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                 )}
               </div>
             ))}
+             {isGuestLimitReached && (
+                 <div className="flex items-center justify-center p-4 my-4 bg-muted rounded-lg">
+                    <div className="text-center">
+                        <p className="font-semibold text-destructive">Message limit reached</p>
+                        <p className="text-sm text-muted-foreground">Please log in to continue the conversation.</p>
+                        <Button onClick={() => router.push('/login')} className="mt-4">
+                            <LogIn className="mr-2 h-4 w-4" />
+                            Login / Sign Up
+                        </Button>
+                    </div>
+                </div>
+            )}
             {isLoading && (
               <div className="flex items-start gap-4">
                  <Avatar className="w-8 h-8 border border-primary/20">
@@ -359,7 +395,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             size="icon"
             onClick={() => fileInputRef.current?.click()}
             aria-label="Upload document"
-            disabled={isLoading}
+            disabled={isLoading || isGuestLimitReached}
           >
             <Paperclip className="h-5 w-5" />
           </Button>
@@ -367,10 +403,10 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={documentState ? `Ask about ${documentState.name}...` : "Ask a question..."}
-            disabled={isLoading}
+            disabled={isLoading || isGuestLimitReached}
             autoComplete="off"
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim()} aria-label="Send message">
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || isGuestLimitReached} aria-label="Send message">
             <SendHorizonal className="h-5 w-5" />
           </Button>
         </form>

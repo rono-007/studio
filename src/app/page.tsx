@@ -2,8 +2,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot, MessageSquarePlus, Trash2, Pencil } from 'lucide-react';
-import { ChatContainer, type ChatSession, type Message, type DocumentState } from '@/components/chat-container';
+import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut } from 'lucide-react';
+import { ChatContainer, type ChatSession } from '@/components/chat-container';
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +14,6 @@ import {
   SidebarMenuButton,
   SidebarMenuAction,
   SidebarProvider,
-  SidebarTrigger,
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
@@ -28,8 +27,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from 'next/navigation';
+import { getAuth, signOut } from 'firebase/auth';
+
+const GUEST_SESSIONS_KEY = 'parseai_guest_sessions';
+const ACTIVE_GUEST_SESSION_ID_KEY = 'parseai_active_guest_session_id';
 
 export default function Home() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -38,24 +42,37 @@ export default function Home() {
   const [editingTitle, setEditingTitle] = useState('');
   const [isClient, setIsClient] = useState(false);
   const editInputRef = useRef<HTMLInputElement>(null);
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  const getSessionsKey = () => user ? `parseai_sessions_${user.uid}` : GUEST_SESSIONS_KEY;
+  const getActiveSessionIdKey = () => user ? `parseai_active_session_id_${user.uid}` : ACTIVE_GUEST_SESSION_ID_KEY;
 
   useEffect(() => {
     setIsClient(true);
-    try {
-      const storedSessions = localStorage.getItem('parseai_sessions');
-      const storedActiveId = localStorage.getItem('parseai_active_session_id');
+  }, []);
+  
+  useEffect(() => {
+    if (!isClient || loading) return;
 
+    const sessionsKey = getSessionsKey();
+    const activeIdKey = getActiveSessionIdKey();
+
+    try {
+      const storedSessions = localStorage.getItem(sessionsKey);
+      const storedActiveId = localStorage.getItem(activeIdKey);
+
+      let parsedSessions: ChatSession[] = [];
       if (storedSessions) {
-        const parsedSessions = JSON.parse(storedSessions);
-        if (parsedSessions.length > 0) {
-          setSessions(parsedSessions);
-          if (storedActiveId && parsedSessions.some((s: ChatSession) => s.id === storedActiveId)) {
-            setActiveSessionId(storedActiveId);
-          } else {
-            setActiveSessionId(parsedSessions[0].id);
-          }
+        parsedSessions = JSON.parse(storedSessions);
+      }
+
+      if (parsedSessions.length > 0) {
+        setSessions(parsedSessions);
+        if (storedActiveId && parsedSessions.some(s => s.id === storedActiveId)) {
+          setActiveSessionId(storedActiveId);
         } else {
-          createNewSession();
+          setActiveSessionId(parsedSessions[0].id);
         }
       } else {
         createNewSession();
@@ -64,24 +81,26 @@ export default function Home() {
       console.error("Failed to load sessions from localStorage", error);
       createNewSession();
     }
-  }, []);
+  }, [isClient, user, loading]);
+
 
   useEffect(() => {
-    if(isClient && sessions.length > 0) {
-        try {
-            localStorage.setItem('parseai_sessions', JSON.stringify(sessions));
-        } catch (error) {
-            console.error("Failed to save sessions to localStorage", error);
-        }
+    if (!isClient || loading) return;
+
+    const sessionsKey = getSessionsKey();
+    const activeIdKey = getActiveSessionIdKey();
+    
+    if (sessions.length > 0) {
+      localStorage.setItem(sessionsKey, JSON.stringify(sessions));
+    } else {
+      localStorage.removeItem(sessionsKey);
     }
-    if (isClient && activeSessionId) {
-        try {
-            localStorage.setItem('parseai_active_session_id', activeSessionId);
-        } catch (error) {
-             console.error("Failed to save active session ID to localStorage", error);
-        }
+    if (activeSessionId) {
+      localStorage.setItem(activeIdKey, activeSessionId);
+    } else {
+       localStorage.removeItem(activeIdKey);
     }
-  }, [sessions, activeSessionId, isClient]);
+  }, [sessions, activeSessionId, isClient, user, loading]);
 
    useEffect(() => {
     if (editingSessionId && editInputRef.current) {
@@ -117,13 +136,11 @@ export default function Home() {
             if (newSessions.length > 0) {
                 setActiveSessionId(newSessions[0].id);
             } else {
-                // This will also handle creating a new session if all are deleted
                 setActiveSessionId(null);
+                 createNewSession();
             }
         }
         if (newSessions.length === 0) {
-            localStorage.removeItem('parseai_sessions');
-            localStorage.removeItem('parseai_active_session_id');
             createNewSession();
         }
         return newSessions;
@@ -154,10 +171,22 @@ export default function Home() {
     }
   }
 
+  const handleLogout = async () => {
+    const auth = getAuth();
+    await signOut(auth);
+    setSessions([]);
+    setActiveSessionId(null);
+    router.push('/login');
+  };
+
   const activeSession = sessions.find(s => s.id === activeSessionId);
   
-  if (!isClient) {
-    return null; 
+  if (!isClient || loading) {
+    return (
+        <div className="flex min-h-screen items-center justify-center">
+            <Bot size={48} className="text-muted-foreground animate-pulse" />
+        </div>
+    );
   }
 
   return (
@@ -223,7 +252,17 @@ export default function Home() {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-          {/* Footer content if needed */}
+            {user ? (
+                <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
+                    <LogOut className="mr-2" />
+                    Logout
+                </Button>
+            ) : (
+                <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/login')}>
+                    <LogIn className="mr-2" />
+                    Login / Sign Up
+                </Button>
+            )}
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
