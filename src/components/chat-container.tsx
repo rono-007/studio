@@ -39,6 +39,7 @@ export type Message = {
 export type DocumentState = {
   name: string;
   content: string;
+  dataUri: string;
 } | null;
 
 
@@ -103,7 +104,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         const dataUri = reader.result as string;
         const { parsedText } = await parseDocument({ documentDataUri: dataUri });
         
-        const newDocState = { name: file.name, content: parsedText };
+        const newDocState = { name: file.name, content: parsedText, dataUri: dataUri };
         setDocumentState(newDocState);
 
         const systemMessage: Message = {
@@ -161,9 +162,11 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     setLoadingMessage('Thinking...');
 
     try {
+      const isImage = documentState?.dataUri.startsWith('data:image');
       const { answer } = await answerQuestions({
         question: input,
-        documentContent: documentState?.content,
+        documentContent: documentState && !isImage ? documentState.content : undefined,
+        imageDataUri: documentState && isImage ? documentState.dataUri : undefined,
       });
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
       setMessages((prev) => [...prev, assistantMessage]);

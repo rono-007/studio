@@ -14,6 +14,12 @@ import {z} from 'genkit';
 const AnswerQuestionsInputSchema = z.object({
   question: z.string().describe('The question to answer.'),
   documentContent: z.string().optional().describe('The content of the document to answer the question from.'),
+  imageDataUri: z
+    .string()
+    .optional()
+    .describe(
+      "An image as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+    ),
 });
 export type AnswerQuestionsInput = z.infer<typeof AnswerQuestionsInputSchema>;
 
@@ -39,6 +45,10 @@ Document Content:
 ---
 {{{documentContent}}}
 ---
+  {{else if imageDataUri}}
+You will answer the user's question based on the provided image.
+Image:
+{{media url=imageDataUri}}
   {{else}}
 You will answer the user's question from your general knowledge.
   {{/if}}
