@@ -84,14 +84,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const userMessagesCount = session.messages.filter(m => m.role === 'user').length;
   const isGuestLimitReached = !user && userMessagesCount >= GUEST_MESSAGE_LIMIT;
 
-  const showVerificationToast = () => {
-    toast({
-        variant: "destructive",
-        title: "Account not verified",
-        description: "Please check your email to verify your account to get full access.",
-    });
-  }
-
   useEffect(() => {
     if (scrollViewportRef.current) {
       scrollViewportRef.current.scrollTo({
@@ -112,11 +104,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             description: "Please sign up to continue.",
         });
         return;
-    }
-
-    if (user && !user.emailVerified) {
-        // We can still allow usage, but show a toast.
-        showVerificationToast();
     }
 
     setIsLoading(true);
@@ -193,10 +180,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             description: "Please sign up to continue.",
         });
         return;
-    }
-    
-    if (user && !user.emailVerified) {
-      showVerificationToast();
     }
   
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };

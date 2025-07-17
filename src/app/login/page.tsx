@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 import { Button } from "@/components/ui/button";
@@ -58,11 +58,10 @@ export default function LoginPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
       await updateProfile(userCredential.user, { displayName: data.name });
-      await sendEmailVerification(userCredential.user);
       
       toast({
         title: "Signup Successful",
-        description: "A verification email has been sent. Please check your inbox to verify your account.",
+        description: "Welcome! You are now logged in.",
       });
       router.push('/');
     } catch (error: any) {
