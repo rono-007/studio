@@ -71,6 +71,28 @@
   }
 }
 
+@layer utilities {
+  .animate-in {
+    animation: animate-in 0.5s ease-in-out;
+  }
+
+  @keyframes animate-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+
 body {
   font-family: 'Inter', sans-serif;
+  background-color: hsl(var(--background));
+  background-image: radial-gradient(circle at 50% 50%, hsla(var(--background), 0.9), hsl(var(--background))),
+                    radial-gradient(circle at 10% 10%, hsl(var(--secondary)), hsl(var(--background))),
+                    radial-gradient(circle at 90% 80%, hsl(var(--secondary)), hsl(var(--background)));
 }

@@ -326,7 +326,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const currentModelName = allModels.find(m => m.id === selectedModel)?.name || selectedModel;
 
   return (
-    <Card className="w-full h-full flex flex-col shadow-none border-none rounded-none md:rounded-lg md:border">
+    <Card className="w-full h-full flex flex-col shadow-none border-none rounded-none md:rounded-lg md:border bg-card/80 backdrop-blur-sm">
       <CardHeader className="flex flex-row items-center justify-between py-4 px-6 shrink-0">
         <div className="w-10"></div> {/* Spacer for the right button */}
         <div className="flex flex-col items-center">
@@ -379,7 +379,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           )}
            <div className="space-y-6">
             {session.messages.map((message) => (
-              <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
+              <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''} animate-in`}>
                 {message.role !== 'user' && (
                   <Avatar className="w-8 h-8 border border-primary/20">
                      <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
@@ -406,7 +406,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
               </div>
             ))}
             {isLoading && (
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 animate-in">
                  <Avatar className="w-8 h-8 border border-primary/20">
                     <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
                     <AvatarFallback className="bg-primary/10 text-primary">
