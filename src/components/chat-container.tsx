@@ -518,10 +518,10 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                                   <span className="font-normal text-xs font-mono">{model.name}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                   { user && (
+                                   { !authLoading && (
                                     <>
                                         <span className="text-xs text-muted-foreground font-mono">
-                                            {remaining}/{model.limit}
+                                            {user ? `${remaining}/${model.limit}` : `${model.limit}/${model.limit}`}
                                         </span>
                                         <ProgressCircle percentage={percentage} size={20} />
                                     </>
@@ -542,3 +542,5 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
+
+  
