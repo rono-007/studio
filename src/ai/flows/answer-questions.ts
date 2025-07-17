@@ -32,19 +32,19 @@ const prompt = ai.definePrompt({
   input: {schema: AnswerQuestionsInputSchema},
   output: {schema: AnswerQuestionsOutputSchema},
   prompt: `You are a helpful AI assistant.
-
   {{#if documentContent}}
-  You must answer the question based on the information in the document provided.
-  You must also provide a brief explanation of your reasoning for the answer.
+You will answer the user's question based *only* on the content of the document provided below. If the answer is not found in the document, you must state that the information is not available in the provided text. You must also provide a brief explanation of your reasoning for the answer.
 
-  Document Content: {{{documentContent}}}
+Document Content:
+---
+{{{documentContent}}}
+---
   {{else}}
-  Answer the user's question from your general knowledge.
+You will answer the user's question from your general knowledge.
   {{/if}}
 
-  Question: {{{question}}}
-
-  Answer:`,
+Question: {{{question}}}
+`,
 });
 
 const answerQuestionsFlow = ai.defineFlow(
