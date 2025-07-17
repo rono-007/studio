@@ -70,6 +70,7 @@ const models = {
   "Advanced & Code": [
      { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro" },
      { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash" },
+     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17" },
   ],
   "General & Text": [
     { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash" },
@@ -304,8 +305,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   return (
     <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl border-0">
-      <CardHeader className="flex flex-row items-center justify-between py-4 px-6">
-          <CardTitle className="text-2xl font-bold flex items-center gap-2">
+      <CardHeader className="flex flex-row items-center py-4 px-6">
+          <CardTitle className="w-full text-center text-2xl font-bold flex items-center justify-center gap-2">
             <Bot className="text-primary" /> Infinitus
           </CardTitle>
           <AlertDialog>
