@@ -67,13 +67,13 @@ const CodeBlock = ({ language, value }: { language: string, value: string }) => 
 };
 
 const models = {
-  "General & Text": [
-    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash" },
-    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite" },
-  ],
   "Advanced & Code": [
      { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro" },
      { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash" },
+  ],
+  "General & Text": [
+    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash" },
+    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite" },
   ]
 }
 
@@ -81,7 +81,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState("googleai/gemini-2.0-flash");
+  const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
   
   const { user } = useAuth();
   const router = useRouter();
@@ -236,12 +236,16 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
       onSessionUpdate(session.id, { messages: [...updatedMessages, assistantMessage] });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Answering failed:', error);
+       const errorMessageContent = error.message && error.message.includes('429') 
+        ? `I'm sorry, but I've hit the request limit for the selected model (\`${selectedModel}\`). Please try again in a little while, or select a different model from the settings.`
+        : "Sorry, I encountered an error while trying to answer. Please try again.";
+
       const errorMessage: Message = {
         id: Date.now().toString() + 'err',
         role: 'assistant',
-        content: "Sorry, I encountered an error while trying to answer. Please try again.",
+        content: errorMessageContent,
       };
       onSessionUpdate(session.id, { messages: [...updatedMessages, errorMessage] });
     } finally {
@@ -289,7 +293,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   return (
     <Card className="w-full max-w-3xl h-[85vh] flex flex-col shadow-2xl">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between py-4 px-6">
         <div className="w-8"></div> {/* Spacer to balance the clear chat icon */}
         <CardTitle className="text-2xl font-bold flex items-center gap-2">
           <Bot className="text-primary" /> Infinitus
@@ -455,7 +459,3 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
-
-    
-
-    
