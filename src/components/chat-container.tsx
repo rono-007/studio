@@ -269,6 +269,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   return (
     <Card className="w-full max-w-3xl h-[85vh] flex flex-col shadow-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
+        <div className="w-8"></div> {/* Spacer to balance the settings icon */}
         <CardTitle className="text-2xl font-bold flex items-center gap-2">
           <Bot className="text-primary" /> Infinitus
         </CardTitle>
