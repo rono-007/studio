@@ -219,7 +219,7 @@ export default function Home() {
         <SidebarHeader>
            <Button variant="ghost" className="w-full justify-start h-8" onClick={createNewSession}>
             <MessageSquarePlus />
-            <span className="duration-200 transition-[width] ease-linear group-data-[collapsible=icon]/sidebar-wrapper:w-0 group-data-[collapsible=icon]/sidebar-wrapper:opacity-0 group-data-[collapsible=icon]/sidebar-wrapper:ml-0 ml-2">New Chat</span>
+            <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">New Chat</span>
           </Button>
         </SidebarHeader>
         <SidebarContent>
@@ -279,12 +279,12 @@ export default function Home() {
             {user ? (
                 <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
                     <LogOut className="mr-2" />
-                    <span className="duration-200 transition-[width] ease-linear group-data-[collapsible=icon]/sidebar-wrapper:w-0 group-data-[collapsible=icon]/sidebar-wrapper:opacity-0 group-data-[collapsible=icon]/sidebar-wrapper:ml-0 ml-2">Logout</span>
+                    <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Logout</span>
                 </Button>
             ) : (
                 <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/login')}>
                     <LogIn className="mr-2" />
-                    <span className="duration-200 transition-[width] ease-linear group-data-[collapsible=icon]/sidebar-wrapper:w-0 group-data-[collapsible=icon]/sidebar-wrapper:opacity-0 group-data-[collapsible=icon]/sidebar-wrapper:ml-0 ml-2">Login / Sign Up</span>
+                    <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">Login / Sign Up</span>
                 </Button>
             )}
         </SidebarFooter>
