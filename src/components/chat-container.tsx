@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation';
 import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Separator } from './ui/separator';
+import { ProgressCircle } from './ui/progress-circle';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,7 +29,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
 export type Message = {
@@ -68,21 +68,32 @@ const CodeBlock = ({ language, value }: { language: string, value: string }) => 
 
 const models = {
   "Advanced": [
-     { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro" },
-     { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash" },
-     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17" },
+     { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro", limit: 15 },
+     { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash", limit: 60 },
+     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17", limit: 60 },
   ],
   "General": [
-    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash" },
-    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite" },
+    { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash (Default)", limit: 60 },
+    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash", limit: 60 },
+    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite", limit: 60 },
   ]
 }
+
+const allModels = Object.values(models).flat();
+
+type ModelUsage = {
+  [modelId: string]: number;
+};
+
+const MODEL_USAGE_KEY = 'infinitus_model_usage';
+const LAST_RESET_KEY = 'infinitus_last_reset';
 
 export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
+  const [modelUsage, setModelUsage] = useState<ModelUsage>({});
   
   const { user } = useAuth();
   const router = useRouter();
@@ -93,6 +104,29 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   const userMessagesCount = session.messages.filter(m => m.role === 'user').length;
   const isGuestLimitReached = !user && userMessagesCount >= GUEST_MESSAGE_LIMIT;
+
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const lastReset = localStorage.getItem(LAST_RESET_KEY);
+
+    if (lastReset !== today) {
+      localStorage.setItem(MODEL_USAGE_KEY, JSON.stringify({}));
+      localStorage.setItem(LAST_RESET_KEY, today);
+      setModelUsage({});
+    } else {
+      const storedUsage = localStorage.getItem(MODEL_USAGE_KEY);
+      if (storedUsage) {
+        setModelUsage(JSON.parse(storedUsage));
+      }
+    }
+  }, []);
+
+  const updateModelUsage = (modelId: string) => {
+    const newUsage = { ...modelUsage };
+    newUsage[modelId] = (newUsage[modelId] || 0) + 1;
+    setModelUsage(newUsage);
+    localStorage.setItem(MODEL_USAGE_KEY, JSON.stringify(newUsage));
+  };
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -116,7 +150,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   const handleModelChange = (modelId: string) => {
     setSelectedModel(modelId);
-    const modelName = Object.values(models).flat().find(m => m.id === modelId)?.name || modelId;
+    const modelName = allModels.find(m => m.id === modelId)?.name || modelId;
     const systemMessage: Message = {
       id: Date.now().toString(),
       role: 'system',
@@ -213,6 +247,17 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         });
         return;
     }
+    
+    const currentModelInfo = allModels.find(m => m.id === selectedModel);
+    const usage = modelUsage[selectedModel] || 0;
+    if (currentModelInfo && usage >= currentModelInfo.limit) {
+      toast({
+        variant: "destructive",
+        title: "Model limit reached",
+        description: `You have reached the daily limit for ${currentModelInfo.name}. Please select another model.`,
+      });
+      return;
+    }
   
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
     
@@ -248,6 +293,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
       onSessionUpdate(session.id, { messages: [...updatedMessages, assistantMessage] });
+      updateModelUsage(selectedModel);
     } catch (error: any) {
       console.error('Answering failed:', error);
        const errorMessageContent = error.message && error.message.includes('429') 
@@ -445,19 +491,31 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                     <div className="space-y-2">
                         <h4 className="font-medium leading-none">Gemini AI Models</h4>
                         <p className="text-sm text-muted-foreground">
-                            Select a model to use for the conversation.
+                            Select a model to use for the conversation. Limits reset daily.
                         </p>
                     </div>
                     <RadioGroup value={selectedModel} onValueChange={handleModelChange}>
                       {Object.entries(models).map(([category, modelList]) => (
                         <div key={category} className="grid gap-2">
                           <Label className="font-semibold">{category}</Label>
-                          {modelList.map((model) => (
-                             <div key={model.id} className="flex items-center space-x-2">
-                                <RadioGroupItem value={model.id} id={model.id} />
-                                <Label htmlFor={model.id} className="font-normal text-xs font-mono">{model.name}</Label>
-                              </div>
-                          ))}
+                          {modelList.map((model) => {
+                            const usage = modelUsage[model.id] || 0;
+                            const percentage = Math.max(0, 100 - (usage / model.limit) * 100);
+                            return (
+                             <Label htmlFor={model.id} key={model.id} className="flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-muted/50 has-[[data-state=checked]]:bg-muted">
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value={model.id} id={model.id} />
+                                  <span className="font-normal text-xs font-mono">{model.name}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-muted-foreground font-mono">
+                                    {model.limit - usage}/{model.limit}
+                                  </span>
+                                  <ProgressCircle percentage={percentage} size={20} />
+                                </div>
+                              </Label>
+                            )
+                           })}
                            <Separator className="my-2" />
                         </div>
                       ))}
