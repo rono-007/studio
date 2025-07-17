@@ -305,10 +305,16 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   return (
     <Card className="w-full h-full flex flex-col shadow-none border-none rounded-none md:rounded-lg md:border">
-      <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0">
-        <CardTitle className="w-full text-center text-2xl font-bold flex items-center justify-center gap-2">
-          <Bot className="text-primary" /> Infinitus
-        </CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between py-4 px-6 shrink-0">
+        <div className="w-10"></div> {/* Spacer for the right button */}
+        <div className="flex flex-col items-center">
+            <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
+            <Bot className="text-primary" /> Infinitus
+            </CardTitle>
+            <p className="text-xs text-muted-foreground/70 font-mono tracking-tight">
+            powered by Gemini advanced models
+            </p>
+        </div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="ghost" size="icon">
@@ -464,5 +470,3 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
-
-    
