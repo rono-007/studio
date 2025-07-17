@@ -61,7 +61,7 @@ export default function Home() {
     if (!isClient || loading) return;
 
     const sessionsKey = getSessionsKey();
-    const activeIdKey = getActiveIdKey();
+    const activeIdKey = getActiveSessionIdKey();
 
     try {
       const storedSessions = localStorage.getItem(sessionsKey);
