@@ -305,8 +305,8 @@ export default function Home() {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <div className="flex flex-col h-screen">
-            <main className="flex-grow flex items-center justify-center p-4">
+        <div className="h-screen flex flex-col">
+            <main className="flex-grow p-4 flex justify-center items-center">
               {activeSession ? (
                   <ChatContainer
                       key={activeSession.id}

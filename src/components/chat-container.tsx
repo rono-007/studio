@@ -328,7 +328,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             </AlertDialogContent>
           </AlertDialog>
         </CardHeader>
-      <CardContent className="flex-grow overflow-hidden flex flex-col p-0">
+      <CardContent className="flex-grow p-6 pt-0 flex flex-col overflow-y-auto">
         {session.document && (
             <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
@@ -340,7 +340,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                 </Button>
             </div>
         )}
-        <ScrollArea className="h-full pr-4 flex-grow" viewportRef={scrollViewportRef}>
+        <ScrollArea className="flex-grow pr-4 -mr-4">
           <div className="space-y-6">
             {session.messages.map((message) => (
               <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
