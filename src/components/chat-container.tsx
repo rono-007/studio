@@ -383,16 +383,16 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         </AlertDialog>
       </CardHeader>
       <CardContent className="flex-grow p-6 min-h-0 relative">
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <div className="text-center font-headline text-6xl font-bold text-muted-foreground/5 opacity-30 select-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
+            <div className="text-center font-headline text-6xl font-bold text-muted-foreground/10 select-none">
                 <p>Anything.</p>
                 <p>Everything.</p>
                 <p>Just Ask.</p>
             </div>
         </div>
-        <ScrollArea className="h-full pr-4" viewportRef={scrollAreaRef}>
+        <ScrollArea className="h-full pr-4 relative z-10" viewportRef={scrollAreaRef}>
           {session.document && (
-              <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10">
+              <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10 backdrop-blur-sm">
                   <div className="flex items-center gap-2">
                       <FileText className="w-5 h-5 text-primary" />
                       <span className="font-medium">{session.document.name}</span>
@@ -536,5 +536,3 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
-
-    
