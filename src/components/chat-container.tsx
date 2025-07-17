@@ -30,7 +30,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import { getModelUsage, updateModelUsage, type ModelUsage } from '@/services/usage-service';
 
 export type Message = {
   id: string;
@@ -82,12 +83,6 @@ const models = {
 
 const allModels = Object.values(models).flat();
 
-type ModelUsage = {
-  [modelId: string]: number;
-};
-
-const MODEL_USAGE_KEY = 'infinitus_model_usage';
-const LAST_RESET_KEY = 'infinitus_last_reset';
 
 export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) {
   const [input, setInput] = useState('');
@@ -96,7 +91,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
   const [modelUsage, setModelUsage] = useState<ModelUsage>({});
   
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -107,27 +102,21 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const isGuestLimitReached = !user && userMessagesCount >= GUEST_MESSAGE_LIMIT;
 
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const lastReset = localStorage.getItem(LAST_RESET_KEY);
+    if (authLoading) return; // Wait for authentication to resolve
 
-    if (lastReset !== today) {
-      localStorage.setItem(MODEL_USAGE_KEY, JSON.stringify({}));
-      localStorage.setItem(LAST_RESET_KEY, today);
-      setModelUsage({});
+    if (user) {
+      // Fetch usage for logged-in user
+      const fetchUsage = async () => {
+        const usage = await getModelUsage(user.uid);
+        setModelUsage(usage);
+      };
+      fetchUsage();
     } else {
-      const storedUsage = localStorage.getItem(MODEL_USAGE_KEY);
-      if (storedUsage) {
-        setModelUsage(JSON.parse(storedUsage));
-      }
+      // Clear usage for guest user
+      setModelUsage({});
     }
-  }, []);
+  }, [user, authLoading]);
 
-  const updateModelUsage = (modelId: string) => {
-    const newUsage = { ...modelUsage };
-    newUsage[modelId] = (newUsage[modelId] || 0) + 1;
-    setModelUsage(newUsage);
-    localStorage.setItem(MODEL_USAGE_KEY, JSON.stringify(newUsage));
-  };
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -240,24 +229,26 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     const userMessageContent = input.trim();
     if (!userMessageContent) return;
 
-    if(isGuestLimitReached) {
-        toast({
+    if (!user) { // Guest user check
+      if(isGuestLimitReached) {
+          toast({
+              variant: "destructive",
+              title: "Message limit reached",
+              description: "Please sign up to continue the conversation.",
+          });
+          return;
+      }
+    } else { // Logged-in user check
+        const currentModelInfo = allModels.find(m => m.id === selectedModel);
+        const usage = modelUsage[selectedModel] || 0;
+        if (currentModelInfo && usage >= currentModelInfo.limit) {
+          toast({
             variant: "destructive",
-            title: "Message limit reached",
-            description: "Please sign up to continue.",
-        });
-        return;
-    }
-    
-    const currentModelInfo = allModels.find(m => m.id === selectedModel);
-    const usage = modelUsage[selectedModel] || 0;
-    if (currentModelInfo && usage >= currentModelInfo.limit) {
-      toast({
-        variant: "destructive",
-        title: "Model limit reached",
-        description: `You have reached the daily limit for ${currentModelInfo.name}. Please select another model.`,
-      });
-      return;
+            title: "Model limit reached",
+            description: `You have reached the daily limit for ${currentModelInfo.name}. Please select another model.`,
+          });
+          return;
+        }
     }
   
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
@@ -294,7 +285,15 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
       onSessionUpdate(session.id, { messages: [...updatedMessages, assistantMessage] });
-      updateModelUsage(selectedModel);
+
+      // After successful response, update usage
+      if(user) {
+        await updateModelUsage(user.uid, selectedModel);
+        // Refresh local usage state
+        const updatedUsage = await getModelUsage(user.uid);
+        setModelUsage(updatedUsage);
+      }
+
     } catch (error: any) {
       console.error('Answering failed:', error);
        const errorMessageContent = error.message && error.message.includes('429') 
@@ -507,19 +506,26 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                         <div key={category} className="grid gap-2">
                           <Label className="font-semibold">{category}</Label>
                           {modelList.map((model) => {
-                            const usage = modelUsage[model.id] || 0;
-                            const percentage = Math.max(0, 100 - (usage / model.limit) * 100);
+                            const usage = user ? modelUsage[model.id] || 0 : 0;
+                            const remaining = model.limit - usage;
+                            const percentage = user ? (remaining / model.limit) * 100 : 100;
+                            const isDisabled = user ? remaining <= 0 : false;
+
                             return (
-                             <Label htmlFor={model.id} key={model.id} className="flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-muted/50 has-[[data-state=checked]]:bg-muted">
+                             <Label htmlFor={model.id} key={model.id} className={`flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-muted/50 has-[[data-state=checked]]:bg-muted ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value={model.id} id={model.id} />
+                                  <RadioGroupItem value={model.id} id={model.id} disabled={isDisabled}/>
                                   <span className="font-normal text-xs font-mono">{model.name}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs text-muted-foreground font-mono">
-                                    {model.limit - usage}/{model.limit}
-                                  </span>
-                                  <ProgressCircle percentage={percentage} size={20} />
+                                   { user && (
+                                    <>
+                                        <span className="text-xs text-muted-foreground font-mono">
+                                            {remaining}/{model.limit}
+                                        </span>
+                                        <ProgressCircle percentage={percentage} size={20} />
+                                    </>
+                                   )}
                                 </div>
                               </Label>
                             )
