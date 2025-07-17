@@ -180,28 +180,13 @@ export default function Home({ params: {} }: { params: {} }) {
 
   const handleLogout = async () => {
     try {
-      const uid = user?.uid; // Capture UID before signing out
       await signOut(auth);
-
-      // Clear all session data associated with the logged-out user and guests
-      if (uid) {
-        localStorage.removeItem(`infinitus_sessions_${uid}`);
-        localStorage.removeItem(`infinitus_active_session_id_${uid}`);
-      }
-      localStorage.removeItem(GUEST_SESSIONS_KEY);
-      localStorage.removeItem(ACTIVE_GUEST_SESSION_ID_KEY);
       
-      // Reset component state
-      setSessions([]);
-      setActiveSessionId(null);
-
-      toast({
-          title: "Logged Out",
-          description: "You have been successfully logged out.",
-      });
-      
-      // Redirect to login to force a clean state
+      // Force a hard reload to clear all state and re-initialize
       router.push('/login');
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
 
     } catch (error) {
         toast({
@@ -288,12 +273,12 @@ export default function Home({ params: {} }: { params: {} }) {
         </SidebarContent>
         <SidebarFooter className="flex flex-col gap-y-2 items-center group-data-[collapsible=icon]:items-center">
             {user ? (
-                <Button variant="ghost" className="w-full justify-center" onClick={handleLogout}>
+                <Button variant="ghost" className="w-full justify-center group-data-[collapsible=icon]:p-0" onClick={handleLogout}>
                     <LogOut />
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">Logout</span>
                 </Button>
             ) : (
-                <Button variant="ghost" className="w-full justify-center" onClick={() => router.push('/login')}>
+                <Button variant="ghost" className="w-full justify-center group-data-[collapsible=icon]:p-0" onClick={() => router.push('/login')}>
                     <LogIn />
                     <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">Login / Sign Up</span>
                 </Button>
