@@ -19,6 +19,17 @@ import { useRouter } from 'next/navigation';
 import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Separator } from './ui/separator';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export type Message = {
   id: string;
@@ -90,6 +101,17 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       });
     }
   }, [session.messages, isLoading]);
+
+  const clearActiveChat = () => {
+    onSessionUpdate(session.id, {
+      messages: [{
+        id: 'init',
+        role: 'assistant',
+        content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
+      }],
+      document: null,
+    });
+  }
 
   const handleModelChange = (modelId: string) => {
     setSelectedModel(modelId);
@@ -282,6 +304,30 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   return (
     <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl border-0">
+      <CardHeader className="flex flex-row items-center justify-between py-4 px-6">
+          <CardTitle className="text-2xl font-bold flex items-center gap-2">
+            <Bot className="text-primary" /> Infinitus
+          </CardTitle>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Trash2 />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will clear all messages in this chat. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={clearActiveChat}>Clear</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </CardHeader>
       <CardContent className="flex-grow overflow-hidden flex flex-col p-0">
         {session.document && (
             <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm">

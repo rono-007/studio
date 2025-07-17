@@ -306,36 +306,6 @@ export default function Home() {
       </Sidebar>
       <SidebarInset>
         <div className="flex flex-col h-screen">
-             <header className="p-2 border-b flex items-center justify-between gap-2 h-14">
-              {activeSession ? (
-                <>
-                  <CardTitle className="text-2xl font-bold flex items-center gap-2">
-                    <Bot className="text-primary" /> ParseAI
-                  </CardTitle>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will clear all messages in this chat. This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={clearActiveChat}>Clear</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </>
-              ) : (
-                 <div></div> 
-              )}
-            </header>
             <main className="flex-grow flex items-center justify-center p-4">
               {activeSession ? (
                   <ChatContainer
