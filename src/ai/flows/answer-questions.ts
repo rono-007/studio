@@ -26,7 +26,7 @@ const AnswerQuestionsInputSchema = z.object({
     .string()
     .optional()
     .describe(
-      "An image as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "An image as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'"
     ),
 });
 export type AnswerQuestionsInput = z.infer<typeof AnswerQuestionsInputSchema>;
@@ -86,7 +86,18 @@ const answerQuestionsFlow = ai.defineFlow(
   async (input) => {
     const model = input.model;
     
-    const {output} = await prompt(input, {model});
-    return output!;
+    try {
+      const {output} = await prompt(input, {model});
+      return output!;
+    } catch (e: any) {
+      if (e.message && e.message.includes('[429 Too Many Requests]')) {
+        return {
+          answer: `I'm sorry, but I've hit the request limit for the selected model (\`${input.model}\`). Please try again in a little while, or select a different model from the settings.`,
+          reasoning: 'API rate limit exceeded.',
+        };
+      }
+      // Re-throw other errors
+      throw e;
+    }
   },
 );
