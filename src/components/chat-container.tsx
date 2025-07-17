@@ -95,8 +95,6 @@ const ThinkingIndicator = () => (
 const models = {
   "Advanced": [
      { id: "googleai/gemini-1.5-pro-latest", name: "Gemini 1.5 Pro", description: "Most capable model for complex reasoning." },
-     { id: "googleai/gemma-2-27b-it", name: "Gemma 2 27B", description: "Most capable Gemma model for complex tasks." },
-     { id: "googleai/gemma-2-9b-it", name: "Gemma 2 9B (Default)", description: "Balanced performance and capability." },
   ],
   "General": [
     { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash", description: "Balanced speed and capability." },
@@ -110,7 +108,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState("googleai/gemma-2-9b-it");
+  const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
   
   const { user } = useAuth();
   const router = useRouter();
