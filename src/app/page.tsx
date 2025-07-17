@@ -225,56 +225,58 @@ export default function Home({ params: {} }: { params: {} }) {
           <SidebarMenu>
             {sessions.map((session) => (
               <SidebarMenuItem key={session.id}>
-                {editingSessionId === session.id ? (
-                  <Input
-                    ref={editInputRef}
-                    value={editingTitle}
-                    onChange={handleTitleChange}
-                    onBlur={handleFinishEdit}
-                    onKeyDown={handleEditKeyDown}
-                    className="h-8 w-full"
-                  />
-                ) : (
-                  <SidebarMenuButton
-                    variant="ghost"
-                    onClick={() => setActiveSessionId(session.id)}
-                    isActive={session.id === activeSessionId}
-                    className="truncate justify-center"
-                  >
-                    {session.title}
-                  </SidebarMenuButton>
-                )}
-                 <div className="flex items-center">
-                    {editingSessionId !== session.id && (
-                        <SidebarMenuAction showOnHover onClick={() => handleStartEdit(session)}>
-                            <Pencil />
-                        </SidebarMenuAction>
-                    )}
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                         <SidebarMenuAction showOnHover>
-                          <Trash2 />
-                        </SidebarMenuAction>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This will permanently delete this chat session.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => deleteSession(session.id)}>Delete</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                 </div>
+                <div className="group relative flex w-full items-center">
+                  {editingSessionId === session.id ? (
+                    <Input
+                      ref={editInputRef}
+                      value={editingTitle}
+                      onChange={handleTitleChange}
+                      onBlur={handleFinishEdit}
+                      onKeyDown={handleEditKeyDown}
+                      className="h-8 w-full"
+                    />
+                  ) : (
+                    <SidebarMenuButton
+                      variant="ghost"
+                      onClick={() => setActiveSessionId(session.id)}
+                      isActive={session.id === activeSessionId}
+                      className="w-full truncate justify-center"
+                    >
+                      {session.title}
+                    </SidebarMenuButton>
+                  )}
+                  {editingSessionId !== session.id && (
+                    <div className="absolute right-1 flex items-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      <SidebarMenuAction onClick={() => handleStartEdit(session)}>
+                        <Pencil />
+                      </SidebarMenuAction>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <SidebarMenuAction>
+                            <Trash2 />
+                          </SidebarMenuAction>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete this chat session.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteSession(session.id)}>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  )}
+                </div>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter className="flex flex-col items-center group-data-[collapsible=icon]:items-center">
+        <SidebarFooter className="flex flex-col gap-y-2 items-center group-data-[collapsible=icon]:items-center">
             {user ? (
                 <Button variant="ghost" className="justify-center" onClick={handleLogout}>
                     <LogOut />
