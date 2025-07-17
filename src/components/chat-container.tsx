@@ -101,7 +101,7 @@ const models = {
     { id: "googleai/gemini-2.0-flash-lite-preview-05-14", name: "Gemini 2.0 Flash-Lite", description: "The lightest and most efficient Gemini 2.0 model." },
   ],
   "Embedding models": [
-    { id: "googleai/text-embedding-004", name: "Gemini Embedding", description: "Generates vector embeddings for text." },
+    { id: "googleai/text-embedding-004", name: "Gemini Embedding (text-embedding-004)", description: "Generates vector embeddings for text." },
   ]
 };
 
