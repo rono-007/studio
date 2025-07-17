@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut, PanelLeft } from 'lucide-react';
+import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut, PanelLeft, X } from 'lucide-react';
 import { ChatContainer, type ChatSession } from '@/components/chat-container';
 import {
   Sidebar,
@@ -16,6 +16,7 @@ import {
   SidebarProvider,
   SidebarFooter,
   SidebarTrigger,
+  SheetClose
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -216,7 +217,7 @@ export default function Home() {
     <SidebarProvider>
       <Sidebar side="left" collapsible="icon">
         <SidebarHeader>
-           <Button variant="ghost" className="w-full justify-start h-8" onClick={createNewSession}>
+           <Button variant="ghost" className="w-full justify-start group-data-[collapsible=icon]:justify-center h-8" onClick={createNewSession}>
             <MessageSquarePlus />
             <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">New Chat</span>
           </Button>
