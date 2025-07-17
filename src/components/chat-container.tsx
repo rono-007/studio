@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef, type FormEvent } from 'react';
-import { Bot, User, Paperclip, SendHorizonal, Loader2, FileText, Settings, X, Trash2, LogIn } from 'lucide-react';
+import { Bot, User, Paperclip, SendHorizonal, Loader2, FileText, Settings, X, Trash2, LogIn, Copy, Check } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -57,23 +57,50 @@ interface ChatContainerProps {
 }
 
 const CodeBlock = ({ language, value }: { language: string, value: string }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(value).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    });
+  };
+
   return (
-    <SyntaxHighlighter language={language} style={atomDark}>
-      {value}
-    </SyntaxHighlighter>
+    <div className="relative">
+      <button
+        onClick={handleCopy}
+        className="absolute top-2 right-2 p-1.5 rounded-md text-white/50 bg-black/30 hover:bg-black/50 hover:text-white transition-colors"
+        aria-label="Copy code"
+      >
+        {isCopied ? <Check size={16} /> : <Copy size={16} />}
+      </button>
+      <SyntaxHighlighter language={language} style={atomDark} customStyle={{ margin: 0 }}>
+        {value}
+      </SyntaxHighlighter>
+    </div>
   );
 };
 
+const ThinkingIndicator = () => (
+    <div className="flex items-center space-x-1">
+        <span className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+        <span className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+        <span className="h-2 w-2 bg-primary rounded-full animate-bounce"></span>
+    </div>
+);
+
+
 const models = {
   "Advanced": [
-     { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro" },
-     { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash" },
-     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17" },
+     { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro", description: "Most capable model for complex reasoning." },
+     { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash", description: "Fast and powerful for mixed media." },
+     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17", description: "The very latest lightweight preview model." },
   ],
   "General": [
-    { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash (Default)" },
-    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash" },
-    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite" },
+    { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash (Default)", description: "Balanced speed and capability." },
+    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash", description: "A solid and reliable general-purpose model." },
+    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite", description: "Fastest and most efficient for simple tasks." },
   ]
 }
 
@@ -368,9 +395,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                       <Bot size={20} />
                     </AvatarFallback>
                   </Avatar>
-                <div className="rounded-lg px-4 py-2 bg-secondary flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <p className="text-sm">{loadingMessage}</p>
+                <div className="rounded-lg px-4 py-3 bg-secondary flex items-center gap-2">
+                  <ThinkingIndicator />
                 </div>
               </div>
             )}
@@ -431,10 +457,11 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                         <div key={category} className="grid gap-2">
                           <Label className="font-semibold">{category}</Label>
                           {modelList.map((model) => (
-                             <Label htmlFor={model.id} key={model.id} className="flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-muted/50 has-[[data-state=checked]]:bg-muted cursor-pointer">
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value={model.id} id={model.id} />
+                             <Label htmlFor={model.id} key={model.id} className="flex items-start space-x-2 p-2 rounded-md hover:bg-muted/50 has-[[data-state=checked]]:bg-muted cursor-pointer">
+                                <RadioGroupItem value={model.id} id={model.id} className="mt-1"/>
+                                <div className="grid gap-1.5">
                                   <span className="font-normal text-xs font-mono">{model.name}</span>
+                                  <p className="text-xs text-muted-foreground">{model.description}</p>
                                 </div>
                               </Label>
                             )
