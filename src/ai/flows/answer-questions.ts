@@ -19,6 +19,7 @@ const HistoryItemSchema = z.object({
 
 const AnswerQuestionsInputSchema = z.object({
   question: z.string().describe('The question to answer.'),
+  model: z.string().optional().describe('The model to use for the answer.'),
   history: z.array(HistoryItemSchema).optional().describe('The history of the conversation.'),
   documentContent: z.string().optional().describe('The content of the document to answer the question from.'),
   imageDataUri: z
@@ -82,8 +83,10 @@ const answerQuestionsFlow = ai.defineFlow(
     inputSchema: AnswerQuestionsInputSchema,
     outputSchema: AnswerQuestionsOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input) => {
+    const model = input.model ? ai.model(input.model) : undefined;
+    
+    const {output} = await prompt(input, {model});
     return output!;
   },
 );

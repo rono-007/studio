@@ -27,6 +27,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
+import { Label } from './ui/label';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { Separator } from './ui/separator';
 
 export type Message = {
   id: string;
@@ -63,11 +66,25 @@ const CodeBlock = ({ language, value }: { language: string, value: string }) => 
   );
 };
 
+const models = {
+  "Conversations & Text": [
+    { id: "googleai/gemini-1.5-flash-latest", name: "gemini-1.5-flash-latest" },
+    { id: "googleai/gemini-2.0-flash", name: "gemini-2.0-flash" }
+  ],
+  "Image Understanding": [
+    { id: "googleai/gemini-1.5-flash-latest", name: "gemini-1.5-flash-latest" }
+  ],
+  "Code & Bug Fixing": [
+    { id: "googleai/gemini-1.5-pro-latest", name: "gemini-1.5-pro-latest" },
+    { id: "googleai/gemini-2.5-pro", name: "gemini-2.5-pro" }
+  ]
+}
 
 export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
+  const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
   
   const { user } = useAuth();
   const router = useRouter();
@@ -206,6 +223,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         history,
         documentContent: session.document && !isImage ? session.document.content : undefined,
         imageDataUri: session.document && isImage ? session.document.dataUri : undefined,
+        model: selectedModel,
       });
   
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
@@ -404,22 +422,23 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                     <div className="space-y-2">
                         <h4 className="font-medium leading-none">Gemini AI Models</h4>
                         <p className="text-sm text-muted-foreground">
-                            This app uses different models for different tasks. Here's a brief overview.
+                            Select a model to use for the conversation.
                         </p>
                     </div>
-                    <div className="grid gap-2 text-sm">
-                        <div className="font-semibold">Conversations & Text</div>
-                        <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-flash-latest</code>: Used for quick, general-purpose conversations.</p>
-                         <p className="text-muted-foreground"><code className="font-mono">gemini-2.0-flash</code>: Another good choice for text generation.</p>
-                        
-                        <div className="font-semibold mt-2">Image Understanding</div>
-                        <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-flash-latest</code>: Analyzes the content of uploaded images.</p>
-
-                        <div className="font-semibold mt-2">Code & Bug Fixing</div>
-                         <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-pro-latest</code>: A powerful model for complex coding tasks.</p>
-                         <p className="text-muted-foreground"><code className="font-mono">gemini-2.5-pro</code>: The most capable model for advanced reasoning and coding.</p>
-                    </div>
-                     <p className="text-xs text-muted-foreground italic">Note: Model switching is not enabled in this UI. The app currently uses <code className="font-mono text-xs">gemini-1.5-flash-latest</code> for all tasks.</p>
+                    <RadioGroup value={selectedModel} onValueChange={setSelectedModel}>
+                      {Object.entries(models).map(([category, modelList]) => (
+                        <div key={category} className="grid gap-2">
+                          <Label className="font-semibold">{category}</Label>
+                          {modelList.map((model) => (
+                             <div key={model.id} className="flex items-center space-x-2">
+                                <RadioGroupItem value={model.id} id={model.id} />
+                                <Label htmlFor={model.id} className="font-normal text-xs font-mono">{model.name}</Label>
+                              </div>
+                          ))}
+                           <Separator className="my-2" />
+                        </div>
+                      ))}
+                    </RadioGroup>
                 </div>
             </PopoverContent>
           </Popover>
