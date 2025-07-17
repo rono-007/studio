@@ -361,7 +361,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                 </div>
                  {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">
-                    {user?.photoURL && <AvatarImage src={user.photoURL} alt={user.displayName || 'User Avatar'} />}
+                    <AvatarImage src="https://i.pinimg.com/736x/74/5d/34/745d347f866bdba46dc4f2dc649b7d23.jpg" alt="User Avatar" />
                     <AvatarFallback>
                       <User size={20} />
                     </AvatarFallback>
