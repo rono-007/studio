@@ -240,7 +240,7 @@ export default function Home() {
                     variant="ghost"
                     onClick={() => setActiveSessionId(session.id)}
                     isActive={session.id === activeSessionId}
-                    className="truncate justify-center data-[active=true]:bg-transparent"
+                    className="truncate justify-start"
                   >
                     {session.title}
                   </SidebarMenuButton>
