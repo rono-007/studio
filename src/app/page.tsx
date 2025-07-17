@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut } from 'lucide-react';
+import { Bot, MessageSquarePlus, Trash2, Pencil, LogIn, LogOut, PanelLeft } from 'lucide-react';
 import { ChatContainer, type ChatSession } from '@/components/chat-container';
 import {
   Sidebar,
@@ -290,7 +290,7 @@ export default function Home() {
       </Sidebar>
       <SidebarInset>
         <div className="flex flex-col h-screen">
-            <header className="p-2 md:hidden">
+            <header className="p-2 border-b">
               <SidebarTrigger />
             </header>
             <main className="flex-grow flex items-center justify-center p-4">
