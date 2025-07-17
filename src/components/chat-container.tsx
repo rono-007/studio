@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { parseDocument } from '@/ai/flows/parse-document';
 import { answerQuestions } from '@/ai/flows/answer-questions';
 import { useToast } from '@/hooks/use-toast';
@@ -392,6 +393,34 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           <Button type="submit" size="icon" disabled={isLoading || !input.trim() || isGuestLimitReached} aria-label="Send message">
             <SendHorizonal className="h-5 w-5" />
           </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button type="button" variant="outline" size="icon" aria-label="Model Info">
+                <Settings className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+                <div className="grid gap-4">
+                    <div className="space-y-2">
+                        <h4 className="font-medium leading-none">Gemini AI Models</h4>
+                        <p className="text-sm text-muted-foreground">
+                            This app uses different models for different tasks. Here's a brief overview.
+                        </p>
+                    </div>
+                    <div className="grid gap-2 text-sm">
+                        <div className="font-semibold">Conversations & Text</div>
+                        <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-flash-latest</code>: Used for quick, general-purpose conversations and text generation.</p>
+                        
+                        <div className="font-semibold mt-2">Image Understanding</div>
+                        <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-flash-latest</code>: Analyzes the content of uploaded images.</p>
+
+                        <div className="font-semibold mt-2">Code & Bug Fixing</div>
+                         <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-pro-latest</code>: (Recommended) A more powerful model for complex coding tasks and debugging.</p>
+                    </div>
+                     <p className="text-xs text-muted-foreground italic">Note: Model switching is not enabled in this UI. The app currently uses <code className="font-mono text-xs">gemini-1.5-flash-latest</code> for all tasks.</p>
+                </div>
+            </PopoverContent>
+          </Popover>
         </form>
       </CardFooter>
     </Card>
