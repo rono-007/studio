@@ -19,7 +19,6 @@ import { useRouter } from 'next/navigation';
 import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Separator } from './ui/separator';
-import { ProgressCircle } from './ui/progress-circle';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,7 +30,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { getModelUsage, updateModelUsage, type ModelUsage } from '@/services/usage-service';
 
 export type Message = {
   id: string;
@@ -58,8 +56,6 @@ interface ChatContainerProps {
     onSessionUpdate: (sessionId: string, updates: Partial<ChatSession>) => void;
 }
 
-const GUEST_MESSAGE_LIMIT = 5;
-
 const CodeBlock = ({ language, value }: { language: string, value: string }) => {
   return (
     <SyntaxHighlighter language={language} style={atomDark}>
@@ -70,14 +66,14 @@ const CodeBlock = ({ language, value }: { language: string, value: string }) => 
 
 const models = {
   "Advanced": [
-     { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro", limit: 100 },
-     { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash", limit: 250 },
-     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17", limit: 1000 },
+     { id: "googleai/gemini-2.5-pro", name: "Gemini 2.5 Pro" },
+     { id: "googleai/gemini-2.5-flash", name: "Gemini 2.5 Flash" },
+     { id: "googleai/gemini-2.5-flash-lite-preview-06-17", name: "Gemini 2.5 Flash-Lite Preview 06-17" },
   ],
   "General": [
-    { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash (Default)", limit: 250 },
-    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash", limit: 200 },
-    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite", limit: 200 },
+    { id: "googleai/gemini-1.5-flash-latest", name: "Gemini 1.5 Flash (Default)" },
+    { id: "googleai/gemini-2.0-flash", name: "Gemini 2.0 Flash" },
+    { id: "googleai/gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite" },
   ]
 }
 
@@ -89,34 +85,13 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [selectedModel, setSelectedModel] = useState("googleai/gemini-1.5-flash-latest");
-  const [modelUsage, setModelUsage] = useState<ModelUsage>({});
   
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
-  const userMessagesCount = session.messages.filter(m => m.role === 'user').length;
-  const isGuestLimitReached = !user && userMessagesCount >= GUEST_MESSAGE_LIMIT;
-
-  useEffect(() => {
-    if (authLoading) return; // Wait for authentication to resolve
-
-    if (user) {
-      // Fetch usage for logged-in user
-      const fetchUsage = async () => {
-        const usage = await getModelUsage(user.uid);
-        setModelUsage(usage);
-      };
-      fetchUsage();
-    } else {
-      // Clear usage for guest user
-      setModelUsage({});
-    }
-  }, [user, authLoading]);
-
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -153,13 +128,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if(isGuestLimitReached) {
-        toast({
-            variant: "destructive",
-            title: "Message limit reached",
-            description: "Please sign up to continue.",
-        });
-        return;
+    if (!user) {
+        const userMessagesCount = session.messages.filter(m => m.role === 'user').length;
     }
 
     setIsLoading(true);
@@ -229,28 +199,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     const userMessageContent = input.trim();
     if (!userMessageContent) return;
 
-    if (!user) { // Guest user check
-      if(isGuestLimitReached) {
-          toast({
-              variant: "destructive",
-              title: "Message limit reached",
-              description: "Please sign up to continue the conversation.",
-          });
-          return;
-      }
-    } else { // Logged-in user check
-        const currentModelInfo = allModels.find(m => m.id === selectedModel);
-        const usage = modelUsage[selectedModel] || 0;
-        if (currentModelInfo && usage >= currentModelInfo.limit) {
-          toast({
-            variant: "destructive",
-            title: "Model limit reached",
-            description: `You have reached the daily limit for ${currentModelInfo.name}. Please select another model.`,
-          });
-          return;
-        }
-    }
-  
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
     
     let title = session.title;
@@ -285,14 +233,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
       onSessionUpdate(session.id, { messages: [...updatedMessages, assistantMessage] });
-
-      // After successful response, update usage
-      if(user) {
-        await updateModelUsage(user.uid, selectedModel);
-        // Refresh local usage state
-        const updatedUsage = await getModelUsage(user.uid);
-        setModelUsage(updatedUsage);
-      }
 
     } catch (error: any) {
       console.error('Answering failed:', error);
@@ -429,18 +369,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                 )}
               </div>
             ))}
-             {isGuestLimitReached && (
-                 <div className="flex items-center justify-center p-4 my-4 bg-muted rounded-lg">
-                    <div className="text-center">
-                        <p className="font-semibold text-destructive">Message limit reached</p>
-                        <p className="text-sm text-muted-foreground">Please sign up to continue the conversation.</p>
-                        <Button onClick={() => router.push('/login')} className="mt-4">
-                            <LogIn className="mr-2 h-4 w-4" />
-                            Sign Up
-                        </Button>
-                    </div>
-                </div>
-            )}
             {isLoading && (
               <div className="flex items-start gap-4">
                  <Avatar className="w-8 h-8 border border-primary/20">
@@ -473,7 +401,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             size="icon"
             onClick={() => fileInputRef.current?.click()}
             aria-label="Upload document"
-            disabled={isLoading || isGuestLimitReached}
+            disabled={isLoading}
           >
             <Paperclip className="h-5 w-5" />
           </Button>
@@ -481,10 +409,10 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={session.document ? `Ask about ${session.document.name}...` : "Ask a question..."}
-            disabled={isLoading || isGuestLimitReached}
+            disabled={isLoading}
             autoComplete="off"
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || isGuestLimitReached} aria-label="Send message">
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim()} aria-label="Send message">
             <SendHorizonal className="h-5 w-5" />
           </Button>
           <Popover>
@@ -498,38 +426,22 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                     <div className="space-y-2">
                         <h4 className="font-medium leading-none">Gemini AI Models</h4>
                         <p className="text-sm text-muted-foreground">
-                            Select a model to use for the conversation. Limits reset daily.
+                            Select a model to use for the conversation.
                         </p>
                     </div>
                     <RadioGroup value={selectedModel} onValueChange={handleModelChange}>
                       {Object.entries(models).map(([category, modelList]) => (
                         <div key={category} className="grid gap-2">
                           <Label className="font-semibold">{category}</Label>
-                          {modelList.map((model) => {
-                            const usage = user ? modelUsage[model.id] || 0 : 0;
-                            const remaining = model.limit - usage;
-                            const percentage = user ? (remaining / model.limit) * 100 : 100;
-                            const isDisabled = user ? remaining <= 0 : false;
-
-                            return (
-                             <Label htmlFor={model.id} key={model.id} className={`flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-muted/50 has-[[data-state=checked]]:bg-muted ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                          {modelList.map((model) => (
+                             <Label htmlFor={model.id} key={model.id} className="flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-muted/50 has-[[data-state=checked]]:bg-muted cursor-pointer">
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value={model.id} id={model.id} disabled={isDisabled}/>
+                                  <RadioGroupItem value={model.id} id={model.id} />
                                   <span className="font-normal text-xs font-mono">{model.name}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                   { !authLoading && (
-                                    <>
-                                        <span className="text-xs text-muted-foreground font-mono">
-                                            {user ? `${remaining}/${model.limit}` : `${model.limit}/${model.limit}`}
-                                        </span>
-                                        <ProgressCircle percentage={percentage} size={20} />
-                                    </>
-                                   )}
                                 </div>
                               </Label>
                             )
-                           })}
+                           )}
                            <Separator className="my-2" />
                         </div>
                       ))}
@@ -542,5 +454,3 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
-
-  
