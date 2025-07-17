@@ -115,13 +115,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   const handleModelChange = (modelId: string) => {
     setSelectedModel(modelId);
-    const modelName = allModels.find(m => m.id === modelId)?.name || modelId;
-    const systemMessage: Message = {
-      id: Date.now().toString(),
-      role: 'system',
-      content: `Switched to ${modelName} model.`,
-    };
-    onSessionUpdate(session.id, { messages: [...session.messages, systemMessage] });
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
