@@ -28,6 +28,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
@@ -80,9 +81,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const { messages, document: documentState } = session;
-
-  const userMessagesCount = messages.filter(m => m.role === 'user').length;
+  const userMessagesCount = session.messages.filter(m => m.role === 'user').length;
   const isGuestLimitReached = !user && userMessagesCount >= GUEST_MESSAGE_LIMIT;
 
 
@@ -93,7 +92,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         behavior: 'smooth',
       });
     }
-  }, [messages, isLoading]);
+  }, [session.messages, isLoading]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -130,7 +129,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
         onSessionUpdate(session.id, {
             document: newDocState,
-            messages: [...messages, systemMessage],
+            messages: [...session.messages, systemMessage],
             title: title
         });
 
@@ -142,7 +141,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           description: 'Could not parse the document. Please try another file.',
         });
         const errorMessage: Message = { id: Date.now().toString(), role: 'assistant', content: "Sorry, I couldn't read that document. Please try another one." };
-        onSessionUpdate(session.id, { messages: [...messages, errorMessage] });
+        onSessionUpdate(session.id, { messages: [...session.messages, errorMessage] });
       } finally {
         setIsLoading(false);
         setLoadingMessage('');
@@ -161,13 +160,13 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   };
 
   const removeDocument = () => {
-      const docName = documentState?.name;
+      const docName = session.document?.name;
       const systemMessage: Message = {
         id: Date.now().toString(),
         role: 'system',
         content: `Removed document "${docName}". The conversation will now be based on general knowledge.`,
       };
-      onSessionUpdate(session.id, { document: null, messages: [...messages, systemMessage] });
+      onSessionUpdate(session.id, { document: null, messages: [...session.messages, systemMessage] });
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -191,17 +190,17 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       title = userMessageContent.substring(0, 30) + (userMessageContent.length > 30 ? '...' : '');
     }
 
-    const newMessages = [...messages, userMessage];
-    onSessionUpdate(session.id, { messages: newMessages, title });
+    const updatedMessages = [...session.messages, userMessage];
+    onSessionUpdate(session.id, { messages: updatedMessages, title });
     setInput('');
 
     setIsLoading(true);
     setLoadingMessage('Thinking...');
   
     try {
-      const isImage = documentState?.dataUri?.startsWith('data:image');
+      const isImage = session.document?.dataUri?.startsWith('data:image');
       
-      const history = newMessages
+      const history = updatedMessages
         .filter(m => m.role === 'user' || m.role === 'assistant')
         .map(m => ({
           role: m.role as 'user' | 'assistant',
@@ -211,12 +210,12 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       const { answer } = await answerQuestions({
         question: userMessageContent,
         history,
-        documentContent: documentState && !isImage ? documentState.content : undefined,
-        imageDataUri: documentState && isImage ? documentState.dataUri : undefined,
+        documentContent: session.document && !isImage ? session.document.content : undefined,
+        imageDataUri: session.document && isImage ? session.document.dataUri : undefined,
       });
   
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
-      onSessionUpdate(session.id, { messages: [...newMessages, assistantMessage] });
+      onSessionUpdate(session.id, { messages: [...updatedMessages, assistantMessage] });
     } catch (error) {
       console.error('Answering failed:', error);
       const errorMessage: Message = {
@@ -224,7 +223,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         role: 'assistant',
         content: "Sorry, I encountered an error while trying to answer. Please try again.",
       };
-      onSessionUpdate(session.id, { messages: [...newMessages, errorMessage] });
+      onSessionUpdate(session.id, { messages: [...updatedMessages, errorMessage] });
     } finally {
       setIsLoading(false);
       setLoadingMessage('');
@@ -314,11 +313,11 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         </DropdownMenu>
       </CardHeader>
       <CardContent className="flex-grow overflow-hidden flex flex-col">
-        {documentState && (
+        {session.document && (
             <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                     <FileText className="w-5 h-5 text-primary" />
-                    <span className="font-medium">{documentState.name}</span>
+                    <span className="font-medium">{session.document.name}</span>
                 </div>
                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removeDocument}>
                     <X className="h-4 w-4" />
@@ -327,7 +326,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         )}
         <ScrollArea className="h-full pr-4 flex-grow" viewportRef={scrollViewportRef}>
           <div className="space-y-6">
-            {messages.map((message) => (
+            {session.messages.map((message) => (
               <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
                 {message.role !== 'user' && (
                   <Avatar className="w-8 h-8 border border-primary/20">
@@ -402,7 +401,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={documentState ? `Ask about ${documentState.name}...` : "Ask a question..."}
+            placeholder={session.document ? `Ask about ${session.document.name}...` : "Ask a question..."}
             disabled={isLoading || isGuestLimitReached}
             autoComplete="off"
           />
