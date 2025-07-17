@@ -347,6 +347,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
               <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
                 {message.role !== 'user' && (
                   <Avatar className="w-8 h-8 border border-primary/20">
+                     <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
                     <AvatarFallback className="bg-primary/10 text-primary">
                       {message.role === 'assistant' ? <Bot size={20} /> : <FileText size={20} />}
                     </AvatarFallback>
@@ -384,6 +385,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             {isLoading && (
               <div className="flex items-start gap-4">
                  <Avatar className="w-8 h-8 border border-primary/20">
+                    <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
                     <AvatarFallback className="bg-primary/10 text-primary">
                       <Bot size={20} />
                     </AvatarFallback>
@@ -462,3 +464,5 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
+
+    
