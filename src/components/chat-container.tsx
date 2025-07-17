@@ -409,13 +409,15 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                     </div>
                     <div className="grid gap-2 text-sm">
                         <div className="font-semibold">Conversations & Text</div>
-                        <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-flash-latest</code>: Used for quick, general-purpose conversations and text generation.</p>
+                        <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-flash-latest</code>: Used for quick, general-purpose conversations.</p>
+                         <p className="text-muted-foreground"><code className="font-mono">gemini-2.0-flash</code>: Another good choice for text generation.</p>
                         
                         <div className="font-semibold mt-2">Image Understanding</div>
                         <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-flash-latest</code>: Analyzes the content of uploaded images.</p>
 
                         <div className="font-semibold mt-2">Code & Bug Fixing</div>
-                         <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-pro-latest</code>: (Recommended) A more powerful model for complex coding tasks and debugging.</p>
+                         <p className="text-muted-foreground"><code className="font-mono">gemini-1.5-pro-latest</code>: A powerful model for complex coding tasks.</p>
+                         <p className="text-muted-foreground"><code className="font-mono">gemini-2.5-pro</code>: The most capable model for advanced reasoning and coding.</p>
                     </div>
                      <p className="text-xs text-muted-foreground italic">Note: Model switching is not enabled in this UI. The app currently uses <code className="font-mono text-xs">gemini-1.5-flash-latest</code> for all tasks.</p>
                 </div>
