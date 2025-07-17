@@ -304,7 +304,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   };
 
   return (
-    <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl">
+    <Card className="w-full max-w-3xl h-full flex flex-col shadow-2xl border-0">
       <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0">
           <CardTitle className="w-full text-center text-2xl font-bold flex items-center justify-center gap-2">
             <Bot className="text-primary" /> Infinitus
@@ -329,8 +329,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             </AlertDialogContent>
           </AlertDialog>
         </CardHeader>
-      <CardContent className="p-6 pt-0 flex-grow min-h-0">
-        <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
+      <CardContent className="p-6 flex-grow min-h-0">
+        <ScrollArea className="h-full pr-6" viewportRef={scrollAreaRef}>
           {session.document && (
               <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10">
                   <div className="flex items-center gap-2">
@@ -342,7 +342,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                   </Button>
               </div>
           )}
-           <div className="space-y-6 pr-6">
+           <div className="space-y-6">
             {session.messages.map((message) => (
               <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
                 {message.role !== 'user' && (
