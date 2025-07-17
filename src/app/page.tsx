@@ -32,6 +32,7 @@ import {
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import { getAuth, signOut } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 const GUEST_SESSIONS_KEY = 'parseai_guest_sessions';
 const ACTIVE_GUEST_SESSION_ID_KEY = 'parseai_active_guest_session_id';
@@ -45,6 +46,7 @@ export default function Home() {
   const editInputRef = useRef<HTMLInputElement>(null);
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
 
   const getSessionsKey = () => user ? `parseai_sessions_${user.uid}` : GUEST_SESSIONS_KEY;
   const getActiveSessionIdKey = () => user ? `parseai_active_session_id_${user.uid}` : ACTIVE_GUEST_SESSION_ID_KEY;
@@ -177,7 +179,13 @@ export default function Home() {
     await signOut(auth);
     setSessions([]);
     setActiveSessionId(null);
-    router.push('/login');
+    toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+    });
+    // After logout, the user becomes a guest, so we need to initialize a new guest session.
+    createNewSession();
+    router.push('/');
   };
 
   const activeSession = sessions.find(s => s.id === activeSessionId);
@@ -261,7 +269,7 @@ export default function Home() {
             ) : (
                 <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/login')}>
                     <LogIn className="mr-2" />
-                    Login / Sign Up
+                    Sign Up
                 </Button>
             )}
         </SidebarFooter>

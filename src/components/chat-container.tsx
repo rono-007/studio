@@ -84,6 +84,13 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const userMessagesCount = session.messages.filter(m => m.role === 'user').length;
   const isGuestLimitReached = !user && userMessagesCount >= GUEST_MESSAGE_LIMIT;
 
+  const showVerificationToast = () => {
+    toast({
+        variant: "destructive",
+        title: "Account not verified",
+        description: "Please check your email to verify your account to get full access.",
+    });
+  }
 
   useEffect(() => {
     if (scrollViewportRef.current) {
@@ -102,8 +109,13 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         toast({
             variant: "destructive",
             title: "Message limit reached",
-            description: "Please log in or sign up to continue.",
+            description: "Please sign up to continue.",
         });
+        return;
+    }
+
+    if (user && !user.emailVerified) {
+        showVerificationToast();
         return;
     }
 
@@ -178,8 +190,13 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         toast({
             variant: "destructive",
             title: "Message limit reached",
-            description: "Please log in or sign up to continue.",
+            description: "Please sign up to continue.",
         });
+        return;
+    }
+    
+    if (user && !user.emailVerified) {
+        showVerificationToast();
         return;
     }
   
@@ -355,10 +372,10 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                  <div className="flex items-center justify-center p-4 my-4 bg-muted rounded-lg">
                     <div className="text-center">
                         <p className="font-semibold text-destructive">Message limit reached</p>
-                        <p className="text-sm text-muted-foreground">Please log in to continue the conversation.</p>
+                        <p className="text-sm text-muted-foreground">Please sign up to continue the conversation.</p>
                         <Button onClick={() => router.push('/login')} className="mt-4">
                             <LogIn className="mr-2 h-4 w-4" />
-                            Login / Sign Up
+                            Sign Up
                         </Button>
                     </div>
                 </div>
@@ -394,7 +411,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             size="icon"
             onClick={() => fileInputRef.current?.click()}
             aria-label="Upload document"
-            disabled={isLoading || isGuestLimitReached}
+            disabled={isLoading || isGuestLimitReached || (!!user && !user.emailVerified)}
           >
             <Paperclip className="h-5 w-5" />
           </Button>
@@ -402,10 +419,10 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={session.document ? `Ask about ${session.document.name}...` : "Ask a question..."}
-            disabled={isLoading || isGuestLimitReached}
+            disabled={isLoading || isGuestLimitReached || (!!user && !user.emailVerified)}
             autoComplete="off"
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || isGuestLimitReached} aria-label="Send message">
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || isGuestLimitReached || (!!user && !user.emailVerified)} aria-label="Send message">
             <SendHorizonal className="h-5 w-5" />
           </Button>
         </form>
