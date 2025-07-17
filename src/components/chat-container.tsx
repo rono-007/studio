@@ -308,7 +308,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       <CardHeader className="flex flex-row items-center justify-between py-4 px-6 shrink-0">
         <div className="w-10"></div> {/* Spacer for the right button */}
         <div className="flex flex-col items-center">
-            <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
+            <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2 font-headline">
             <Bot className="text-primary" /> Infinitus
             </CardTitle>
             <p className="text-xs text-muted-foreground/70 font-mono tracking-tight">
