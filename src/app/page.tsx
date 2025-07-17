@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Bot, MessageSquarePlus, Trash2 } from 'lucide-react';
-import { ChatContainer, type ChatSession } from '@/components/chat-container';
+import { ChatContainer, type ChatSession, type Message, type DocumentState } from '@/components/chat-container';
 import {
   Sidebar,
   SidebarContent,
@@ -62,21 +62,21 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if(sessions.length > 0) {
+    if(isClient && sessions.length > 0) {
         try {
             localStorage.setItem('parseai_sessions', JSON.stringify(sessions));
         } catch (error) {
             console.error("Failed to save sessions to localStorage", error);
         }
     }
-    if (activeSessionId) {
+    if (isClient && activeSessionId) {
         try {
             localStorage.setItem('parseai_active_session_id', activeSessionId);
         } catch (error) {
              console.error("Failed to save active session ID to localStorage", error);
         }
     }
-  }, [sessions, activeSessionId]);
+  }, [sessions, activeSessionId, isClient]);
 
   const createNewSession = () => {
     const newSession: ChatSession = {
@@ -95,8 +95,8 @@ export default function Home() {
     setActiveSessionId(newSession.id);
   };
   
-  const updateSession = (updatedSession: ChatSession) => {
-    setSessions(prev => prev.map(s => s.id === updatedSession.id ? updatedSession : s));
+  const updateSession = (sessionId: string, updates: Partial<ChatSession>) => {
+    setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, ...updates } : s));
   }
 
   const deleteSession = (sessionId: string) => {

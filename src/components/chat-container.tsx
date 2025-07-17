@@ -54,7 +54,7 @@ export type ChatSession = {
 
 interface ChatContainerProps {
     session: ChatSession;
-    onSessionUpdate: (session: ChatSession) => void;
+    onSessionUpdate: (sessionId: string, updates: Partial<ChatSession>) => void;
 }
 
 const CodeBlock = ({ language, value }: { language: string, value: string }) => {
@@ -67,8 +67,6 @@ const CodeBlock = ({ language, value }: { language: string, value: string }) => 
 
 
 export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) {
-  const [messages, setMessages] = useState<Message[]>(session.messages);
-  const [documentState, setDocumentState] = useState<DocumentState>(session.document);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
@@ -77,21 +75,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    let title = session.title;
-    if(title === 'New Chat' && messages.length > 1) {
-        const firstUserMessage = messages.find(m => m.role === 'user');
-        if (firstUserMessage) {
-            title = firstUserMessage.content.substring(0, 30) + (firstUserMessage.content.length > 30 ? '...' : '');
-        }
-    } else if (documentState && title === 'New Chat') {
-        title = documentState.name;
-    }
-    
-    const updatedSession: ChatSession = { ...session, messages, document: documentState, title };
-    onSessionUpdate(updatedSession);
-  }, [messages, documentState]);
-  
+  const { messages, document: documentState } = session;
+
   useEffect(() => {
     if (scrollViewportRef.current) {
       scrollViewportRef.current.scrollTo({
@@ -116,14 +101,20 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         const { parsedText } = await parseDocument({ documentDataUri: dataUri });
         
         const newDocState = { name: file.name, content: parsedText, dataUri: dataUri };
-        setDocumentState(newDocState);
-
+        
         const systemMessage: Message = {
             id: Date.now().toString(),
             role: 'system',
             content: `Successfully parsed "${file.name}". You can now ask questions about it.`,
         };
-        setMessages(prev => [...prev, systemMessage]);
+
+        const title = session.title === 'New Chat' ? file.name : session.title;
+
+        onSessionUpdate(session.id, {
+            document: newDocState,
+            messages: [...messages, systemMessage],
+            title: title
+        });
 
       } catch (error) {
         console.error('Parsing failed:', error);
@@ -133,7 +124,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           description: 'Could not parse the document. Please try another file.',
         });
         const errorMessage: Message = { id: Date.now().toString(), role: 'assistant', content: "Sorry, I couldn't read that document. Please try another one." };
-        setMessages(prev => [...prev, errorMessage]);
+        onSessionUpdate(session.id, { messages: [...messages, errorMessage] });
       } finally {
         setIsLoading(false);
         setLoadingMessage('');
@@ -153,13 +144,12 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   const removeDocument = () => {
       const docName = documentState?.name;
-      setDocumentState(null);
       const systemMessage: Message = {
         id: Date.now().toString(),
         role: 'system',
         content: `Removed document "${docName}". The conversation will now be based on general knowledge.`,
       };
-      setMessages(prev => [...prev, systemMessage]);
+      onSessionUpdate(session.id, { document: null, messages: [...messages, systemMessage] });
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -170,7 +160,14 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     setInput('');
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
     const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+
+    let title = session.title;
+    if (title === 'New Chat') {
+      title = userMessageContent.substring(0, 30) + (userMessageContent.length > 30 ? '...' : '');
+    }
+
+    onSessionUpdate(session.id, { messages: newMessages, title });
+
     setIsLoading(true);
     setLoadingMessage('Thinking...');
   
@@ -186,22 +183,21 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   
       const { answer } = await answerQuestions({
         question: userMessageContent,
-        history: history.slice(0, -1), // Don't include the current question in history
+        history,
         documentContent: documentState && !isImage ? documentState.content : undefined,
         imageDataUri: documentState && isImage ? documentState.dataUri : undefined,
       });
   
       const assistantMessage: Message = { id: Date.now().toString() + 'ai', role: 'assistant', content: answer };
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (error)
- {
+      onSessionUpdate(session.id, { messages: [...newMessages, assistantMessage] });
+    } catch (error) {
       console.error('Answering failed:', error);
       const errorMessage: Message = {
         id: Date.now().toString() + 'err',
         role: 'assistant',
         content: "Sorry, I encountered an error while trying to answer. Please try again.",
       };
-      setMessages(prev => [...prev, errorMessage]);
+      onSessionUpdate(session.id, { messages: [...newMessages, errorMessage] });
     } finally {
       setIsLoading(false);
       setLoadingMessage('');
@@ -278,12 +274,14 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction onClick={() => {
-                          setMessages([{
-                              id: 'init',
-                              role: 'assistant',
-                              content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
-                          }]);
-                          setDocumentState(null);
+                          onSessionUpdate(session.id, {
+                              messages: [{
+                                  id: 'init',
+                                  role: 'assistant',
+                                  content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
+                              }],
+                              document: null,
+                          })
                       }}>Clear</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
