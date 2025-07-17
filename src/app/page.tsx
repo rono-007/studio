@@ -223,7 +223,7 @@ export default function Home() {
           </Button>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu>
+          <SidebarMenu className="mt-4">
             {sessions.map((session) => (
               <SidebarMenuItem key={session.id}>
                 {editingSessionId === session.id ? (
