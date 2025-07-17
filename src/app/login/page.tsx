@@ -24,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
 
 const signupSchema = z.object({
-  name: z.string().min(1, { message: "Name is required." }),
+  firstName: z.string().min(1, { message: "First Name is required." }),
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
@@ -45,7 +45,7 @@ export default function LoginPage({ params: {} }: { params: {} }) {
 
   const signupForm = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: { firstName: "", email: "", password: "" },
   });
 
   const loginForm = useForm<LoginFormValues>({
@@ -57,7 +57,7 @@ export default function LoginPage({ params: {} }: { params: {} }) {
     setIsLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-      await updateProfile(userCredential.user, { displayName: data.name });
+      await updateProfile(userCredential.user, { displayName: data.firstName });
       
       toast({
         title: "Signup Successful",
@@ -134,9 +134,9 @@ export default function LoginPage({ params: {} }: { params: {} }) {
             <TabsContent value="signup">
               <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Name</Label>
-                  <Input id="signup-name" {...signupForm.register("name")} placeholder="John Doe" />
-                   {signupForm.formState.errors.name && <p className="text-destructive text-sm">{signupForm.formState.errors.name.message}</p>}
+                  <Label htmlFor="signup-firstName">First Name</Label>
+                  <Input id="signup-firstName" {...signupForm.register("firstName")} placeholder="John" />
+                   {signupForm.formState.errors.firstName && <p className="text-destructive text-sm">{signupForm.formState.errors.firstName.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">Email</Label>
