@@ -114,6 +114,12 @@ export default function Home({ params: {} }: { params: {} }) {
   }, [editingSessionId]);
 
   const createNewSession = () => {
+    let welcomeMessage = 'hello, ask me anything!';
+    if (user && user.displayName) {
+      const firstName = user.displayName.split(' ')[0];
+      welcomeMessage = `hello ${firstName}, ask me anything!`;
+    }
+
     const newSession: ChatSession = {
       id: `session_${Date.now()}`,
       title: 'New Chat',
@@ -121,7 +127,7 @@ export default function Home({ params: {} }: { params: {} }) {
         {
           id: 'init',
           role: 'assistant',
-          content: 'hello, ask me anything!',
+          content: welcomeMessage,
         },
       ],
       document: null,
