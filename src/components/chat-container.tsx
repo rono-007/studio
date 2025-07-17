@@ -105,6 +105,17 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     }
   }, [session.messages, isLoading]);
 
+  const handleModelChange = (modelId: string) => {
+    setSelectedModel(modelId);
+    const modelName = Object.values(models).flat().find(m => m.id === modelId)?.name || modelId;
+    const systemMessage: Message = {
+      id: Date.now().toString(),
+      role: 'system',
+      content: `Switched to ${modelName} model.`,
+    };
+    onSessionUpdate(session.id, { messages: [...session.messages, systemMessage] });
+  };
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -340,7 +351,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                 )}
                 <div className={`rounded-lg px-4 py-2 max-w-[80%] ${
                   message.role === 'user' ? 'bg-primary text-primary-foreground' :
-                  message.role === 'system' ? 'bg-muted/50 text-muted-foreground italic text-sm' :
+                  message.role === 'system' ? 'bg-muted/50 text-muted-foreground italic text-sm text-center w-full' :
                   'bg-secondary'
                 }`}>
                    {message.role === 'assistant' ? renderMessageContent(message) : <p className="text-sm whitespace-pre-wrap">{message.content}</p>}
@@ -425,7 +436,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                             Select a model to use for the conversation.
                         </p>
                     </div>
-                    <RadioGroup value={selectedModel} onValueChange={setSelectedModel}>
+                    <RadioGroup value={selectedModel} onValueChange={handleModelChange}>
                       {Object.entries(models).map(([category, modelList]) => (
                         <div key={category} className="grid gap-2">
                           <Label className="font-semibold">{category}</Label>
@@ -447,3 +458,5 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
+
+    
