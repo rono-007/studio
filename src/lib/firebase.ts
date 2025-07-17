@@ -1,7 +1,8 @@
-import { initializeApp, getApps, getApp, FirebaseOptions } from "firebase/app";
+
+import { initializeApp, getApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
-const firebaseConfig: FirebaseOptions = {
+const firebaseConfig = {
   apiKey: "AIzaSyDBMVaItQ3hq7bg0vSqo6esmHEBf91lcb0",
   authDomain: "aichatbot-3b57f.firebaseapp.com",
   projectId: "aichatbot-3b57f",
@@ -10,7 +11,8 @@ const firebaseConfig: FirebaseOptions = {
   appId: "1:880096623731:web:0b0207375339997b423e06"
 };
 
+// Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 
-export { app, auth };
+export { auth };
