@@ -121,7 +121,7 @@ export default function Home({ params: {} }: { params: {} }) {
         {
           id: 'init',
           role: 'assistant',
-          content: 'Hello! Ask me anything, or upload a document to ask questions about it.',
+          content: 'hello, ask me anything!',
         },
       ],
       document: null,
