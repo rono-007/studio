@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { parseDocument } from '@/ai/flows/parse-document';
 import { answerQuestions } from '@/ai/flows/answer-questions';
+import { generateTitle } from '@/ai/flows/generate-title';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
@@ -216,20 +217,29 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     if (!userMessageContent) return;
 
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userMessageContent };
-    
-    let title = session.title;
-    if (title === 'New Chat' && userMessageContent.length > 0) {
-      title = userMessageContent.substring(0, 30) + (userMessageContent.length > 30 ? '...' : '');
-    }
-
     const updatedMessages = [...session.messages, userMessage];
-    onSessionUpdate(session.id, { messages: updatedMessages, title });
-    setInput('');
+    
+    // Optimistically update messages
+    onSessionUpdate(session.id, { messages: updatedMessages });
 
+    setInput('');
     setIsLoading(true);
     setLoadingMessage('Thinking...');
   
     try {
+      // Generate title if it's a new chat
+      if (session.title === 'New Chat' && userMessageContent.length > 0) {
+        // Run title generation in parallel with answering the question
+        generateTitle({ message: userMessageContent }).then(({ title }) => {
+          onSessionUpdate(session.id, { title });
+        }).catch(err => {
+          console.error("Failed to generate title:", err);
+          // Fallback to old title logic if AI fails
+          const fallbackTitle = userMessageContent.substring(0, 30) + (userMessageContent.length > 30 ? '...' : '');
+          onSessionUpdate(session.id, { title: fallbackTitle });
+        });
+      }
+
       const isImage = session.document?.dataUri?.startsWith('data:image');
       
       const history = updatedMessages
