@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useRef, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent, useCallback } from 'react';
 import { Bot, User, Paperclip, SendHorizonal, Loader2, FileText, Settings, X, Trash2, LogIn, Copy, Check, Sun, Moon } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -167,18 +167,18 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
   
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (scrollAreaRef.current) {
         scrollAreaRef.current.scrollTo({
         top: scrollAreaRef.current.scrollHeight,
         behavior: 'smooth',
       });
     }
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [isLoading, session.messages]);
+  }, [isLoading, session.messages, scrollToBottom]);
 
   const clearActiveChat = () => {
     onSessionUpdate(session.id, {
