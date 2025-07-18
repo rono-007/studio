@@ -453,7 +453,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="shrink-0 flex flex-col gap-2 pt-2">
+      <CardFooter className="shrink-0 flex flex-col gap-2 pt-2 border-t">
         <div
             key={selectedModel}
             className="text-center text-xs text-muted-foreground font-mono animate-in fade-in zoom-in-95"
@@ -528,5 +528,3 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
-
-    
