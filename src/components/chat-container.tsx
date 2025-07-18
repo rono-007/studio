@@ -341,7 +341,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const currentModelName = allModels.find(m => m.id === selectedModel)?.name || selectedModel;
 
   return (
-    <Card className="w-full h-full flex flex-col shadow-none border-none rounded-none md:rounded-lg md:border bg-card/80 backdrop-blur-sm">
+    <Card className="w-full h-full flex flex-col rounded-lg border bg-card/80 backdrop-blur-sm shadow-none">
       <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0">
         <div className="flex w-1/3 justify-start">
             <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
