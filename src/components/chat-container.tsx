@@ -108,9 +108,9 @@ const models = {
 const allModels = Object.values(models).flat();
 const textGenerationModels = models["Text-out models"];
 
-const AssistantMessage = ({ message, isLastMessage, onAnimate }: { message: Message; isLastMessage: boolean; onAnimate: () => void }) => {
+const AssistantMessage = ({ message, isLastMessage, onAnimate, isLoading }: { message: Message; isLastMessage: boolean; onAnimate: () => void; isLoading: boolean }) => {
   const animatedContent = useTypewriter(message.content, 5, { onUpdate: onAnimate });
-  const contentToRender = isLastMessage ? animatedContent : message.content;
+  const contentToRender = isLastMessage && !isLoading ? animatedContent : message.content;
 
   const renderContent = (content: string) => {
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
@@ -342,13 +342,15 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   return (
     <Card className="w-full h-full flex flex-col shadow-none border-none rounded-none md:rounded-lg md:border bg-card/80 backdrop-blur-sm">
-      <CardHeader className="flex flex-row items-center justify-between py-4 px-6 shrink-0">
-        <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
-            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-        </Button>
-        <div className="flex flex-col items-center">
+      <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0">
+        <div className="flex w-1/3 justify-start">
+            <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+            </Button>
+        </div>
+        <div className="flex flex-col items-center flex-1">
             <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2 font-headline">
             <Bot className="text-primary" /> Infinitus
             </CardTitle>
@@ -356,25 +358,27 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             powered by Gemini advanced models
             </p>
         </div>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Trash2 />
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will clear all messages in this chat. This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={clearActiveChat}>Clear</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <div className="flex w-1/3 justify-end">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Trash2 />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will clear all messages in this chat. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={clearActiveChat}>Clear</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+        </div>
       </CardHeader>
       <CardContent className="flex-grow p-6 min-h-0 relative">
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
@@ -415,7 +419,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                    {message.role === 'assistant' ? (
                       <AssistantMessage 
                         message={message} 
-                        isLastMessage={index === session.messages.length - 1 && !isLoading}
+                        isLastMessage={index === session.messages.length - 1}
+                        isLoading={isLoading}
                         onAnimate={scrollToBottom}
                       />
                     ) : (
