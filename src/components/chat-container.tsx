@@ -108,7 +108,7 @@ const allModels = Object.values(models).flat();
 const textGenerationModels = models["Text-out models"];
 
 const AssistantMessage = ({ message, isLastMessage, onAnimate }: { message: Message; isLastMessage: boolean; onAnimate: () => void }) => {
-  const animatedContent = useTypewriter(message.content, 10, { onUpdate: onAnimate });
+  const animatedContent = useTypewriter(message.content, 5, { onUpdate: onAnimate });
   const contentToRender = isLastMessage ? animatedContent : message.content;
 
   const renderContent = (content: string) => {
