@@ -402,7 +402,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             </div>
           </div>
           <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
-            <div className="p-4">
+            <div className="py-4">
               {session.document && (
                 <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10 backdrop-blur-sm">
                     <div className="flex items-center gap-2">
@@ -414,7 +414,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                     </Button>
                 </div>
               )}
-              <div className="space-y-6">
+              <div className="space-y-6 px-4">
                 {session.messages.map((message, index) => (
                   <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''} animate-in`}>
                     {message.role !== 'user' && (
