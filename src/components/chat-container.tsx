@@ -383,28 +383,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       </CardHeader>
 
       <CardContent className="flex-grow p-6 min-h-0 relative">
-        {isNewChat ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-muted-foreground/10 font-bold font-headline select-none">
-                <h2 className="text-8xl md:text-9xl">Anything.</h2>
-                <h2 className="text-8xl md:text-9xl">Everything.</h2>
-                <h2 className="text-8xl md:text-9xl">Just Ask.</h2>
-              </div>
-            </div>
-            <div className="relative z-10 flex items-start gap-4 animate-in">
-              <Avatar className="w-8 h-8 border border-primary/20">
-                <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
-                <AvatarFallback className="bg-primary/10 text-primary">
-                  <Bot size={20} />
-                </AvatarFallback>
-              </Avatar>
-              <div className="rounded-lg px-4 py-2 max-w-[80%] bg-muted">
-                <p className="text-sm whitespace-pre-wrap">{session.messages[0]?.content}</p>
-              </div>
-            </div>
-          </div>
-        ) : (
           <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
             {session.document && (
               <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10 backdrop-blur-sm">
@@ -469,7 +447,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
               )}
             </div>
           </ScrollArea>
-        )}
       </CardContent>
       
       <CardFooter className="shrink-0 flex flex-col gap-2 p-4 pt-2">
