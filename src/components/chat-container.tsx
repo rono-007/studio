@@ -20,6 +20,7 @@ import { useRouter } from 'next/navigation';
 import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Separator } from './ui/separator';
+import { useTypewriter } from '@/hooks/use-typewriter';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -105,6 +106,50 @@ const models = {
 
 const allModels = Object.values(models).flat();
 const textGenerationModels = models["Text-out models"];
+
+const AssistantMessage = ({ message, isLastMessage }: { message: Message; isLastMessage: boolean }) => {
+  const animatedContent = useTypewriter(message.content, 10);
+  const contentToRender = isLastMessage ? animatedContent : message.content;
+
+  const renderContent = (content: string) => {
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+  
+    while ((match = codeBlockRegex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(
+          <p key={`${message.id}-text-${lastIndex}`} className="text-sm whitespace-pre-wrap">
+            {content.substring(lastIndex, match.index)}
+          </p>
+        );
+      }
+      
+      const language = match[1] || 'text';
+      const code = match[2];
+      parts.push(
+        <div key={`${message.id}-code-${match.index}`} className="my-2 rounded-md overflow-hidden bg-[#2d2d2d]">
+          <CodeBlock language={language} value={code.trim()} />
+        </div>
+      );
+      
+      lastIndex = codeBlockRegex.lastIndex;
+    }
+  
+    if (lastIndex < content.length) {
+      parts.push(
+        <p key={`${message.id}-text-${lastIndex}`} className="text-sm whitespace-pre-wrap">
+          {content.substring(lastIndex)}
+        </p>
+      );
+    }
+  
+    return parts;
+  };
+
+  return <>{renderContent(contentToRender)}</>;
+};
 
 
 export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) {
@@ -286,42 +331,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     }
   };
 
-  const renderMessageContent = (message: Message) => {
-    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-    const parts = [];
-    let lastIndex = 0;
-    let match;
-  
-    while ((match = codeBlockRegex.exec(message.content)) !== null) {
-      if (match.index > lastIndex) {
-        parts.push(
-          <p key={`${message.id}-text-${lastIndex}`} className="text-sm whitespace-pre-wrap">
-            {message.content.substring(lastIndex, match.index)}
-          </p>
-        );
-      }
-      
-      const language = match[1] || 'text';
-      const code = match[2];
-      parts.push(
-        <div key={`${message.id}-code-${match.index}`} className="my-2 rounded-md overflow-hidden bg-[#2d2d2d]">
-          <CodeBlock language={language} value={code.trim()} />
-        </div>
-      );
-      
-      lastIndex = codeBlockRegex.lastIndex;
-    }
-  
-    if (lastIndex < message.content.length) {
-      parts.push(
-        <p key={`${message.id}-text-${lastIndex}`} className="text-sm whitespace-pre-wrap">
-          {message.content.substring(lastIndex)}
-        </p>
-      );
-    }
-  
-    return parts;
-  };
 
   const currentModelName = allModels.find(m => m.id === selectedModel)?.name || selectedModel;
 
@@ -378,7 +387,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
               </div>
           )}
            <div className="space-y-6">
-            {session.messages.map((message) => (
+            {session.messages.map((message, index) => (
               <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''} animate-in`}>
                 {message.role !== 'user' && (
                   <Avatar className="w-8 h-8 border border-primary/20">
@@ -393,7 +402,14 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                   message.role === 'system' ? 'bg-muted/50 text-muted-foreground italic text-sm text-center w-full' :
                   'bg-secondary'
                 }`}>
-                   {message.role === 'assistant' ? renderMessageContent(message) : <p className="text-sm whitespace-pre-wrap">{message.content}</p>}
+                   {message.role === 'assistant' ? (
+                      <AssistantMessage 
+                        message={message} 
+                        isLastMessage={index === session.messages.length - 1 && !isLoading}
+                      />
+                    ) : (
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    )}
                 </div>
                  {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">
