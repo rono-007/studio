@@ -1,8 +1,13 @@
 
 import { useState, useEffect } from 'react';
 
-export const useTypewriter = (text: string, speed: number = 50) => {
+type TypewriterOptions = {
+  onUpdate?: () => void;
+};
+
+export const useTypewriter = (text: string, speed: number = 50, options: TypewriterOptions = {}) => {
   const [displayedText, setDisplayedText] = useState('');
+  const { onUpdate } = options;
 
   useEffect(() => {
     setDisplayedText(''); // Reset on text change
@@ -12,6 +17,7 @@ export const useTypewriter = (text: string, speed: number = 50) => {
             if (i < text.length) {
                 setDisplayedText(prev => prev + text.charAt(i));
                 i++;
+                onUpdate?.(); // Call the callback on each update
             } else {
                 clearInterval(typingInterval);
             }
@@ -21,7 +27,7 @@ export const useTypewriter = (text: string, speed: number = 50) => {
             clearInterval(typingInterval);
         };
     }
-  }, [text, speed]);
+  }, [text, speed, onUpdate]);
 
   return displayedText;
 };

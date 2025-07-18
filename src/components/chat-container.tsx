@@ -107,8 +107,8 @@ const models = {
 const allModels = Object.values(models).flat();
 const textGenerationModels = models["Text-out models"];
 
-const AssistantMessage = ({ message, isLastMessage }: { message: Message; isLastMessage: boolean }) => {
-  const animatedContent = useTypewriter(message.content, 10);
+const AssistantMessage = ({ message, isLastMessage, onAnimate }: { message: Message; isLastMessage: boolean; onAnimate: () => void }) => {
+  const animatedContent = useTypewriter(message.content, 10, { onUpdate: onAnimate });
   const contentToRender = isLastMessage ? animatedContent : message.content;
 
   const renderContent = (content: string) => {
@@ -165,8 +165,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
-  const lastMessage = session.messages[session.messages.length - 1];
-
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
         scrollAreaRef.current.scrollTo({
@@ -179,12 +177,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   useEffect(() => {
     scrollToBottom();
   }, [isLoading, session.messages]);
-  
-  useEffect(() => {
-    if (lastMessage?.role === 'assistant') {
-      scrollToBottom();
-    }
-  }, [lastMessage?.content.length]);
 
   const clearActiveChat = () => {
     onSessionUpdate(session.id, {
@@ -418,6 +410,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                       <AssistantMessage 
                         message={message} 
                         isLastMessage={index === session.messages.length - 1 && !isLoading}
+                        onAnimate={scrollToBottom}
                       />
                     ) : (
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
