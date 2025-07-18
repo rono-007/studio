@@ -414,7 +414,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                 <div className={`rounded-lg px-4 py-2 max-w-[80%] ${
                   message.role === 'user' ? 'bg-primary text-primary-foreground' :
                   message.role === 'system' ? 'bg-muted/50 text-muted-foreground italic text-sm text-center w-full' :
-                  'bg-secondary'
+                  'bg-muted/60'
                 }`}>
                    {message.role === 'assistant' ? (
                       <AssistantMessage 
