@@ -164,15 +164,27 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  
+  const lastMessage = session.messages[session.messages.length - 1];
 
-  useEffect(() => {
+  const scrollToBottom = () => {
     if (scrollAreaRef.current) {
         scrollAreaRef.current.scrollTo({
         top: scrollAreaRef.current.scrollHeight,
         behavior: 'smooth',
       });
     }
-  }, [session.messages, isLoading]);
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [isLoading, session.messages]);
+  
+  useEffect(() => {
+    if (lastMessage?.role === 'assistant') {
+      scrollToBottom();
+    }
+  }, [lastMessage?.content.length]);
 
   const clearActiveChat = () => {
     onSessionUpdate(session.id, {
