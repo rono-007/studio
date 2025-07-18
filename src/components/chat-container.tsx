@@ -158,13 +158,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [selectedModel, setSelectedModel] = useState("googleai/gemini-2.5-flash-lite-preview-06-17");
-  
-  const hasMessages = session.messages.length > 1 || (session.messages.length === 1 && session.messages[0].role !== 'assistant');
-  const [isInputActive, setIsInputActive] = useState(hasMessages);
-
   const { user } = useAuth();
   const router = useRouter();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -180,24 +175,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   }, []);
 
   useEffect(() => {
-    if (isInputActive) {
-        scrollToBottom();
-    }
-  }, [isLoading, session.messages, scrollToBottom, isInputActive]);
-  
-  useEffect(() => {
-    // If a session is loaded with messages, the input should be active.
-    if (hasMessages) {
-        setIsInputActive(true);
-    }
-  }, [session.id, hasMessages]);
-
-
-  const activateInput = () => {
-    if (!isInputActive) {
-      setIsInputActive(true);
-    }
-  }
+    scrollToBottom();
+  }, [isLoading, session.messages, scrollToBottom]);
 
   const clearActiveChat = () => {
     onSessionUpdate(session.id, {
@@ -208,7 +187,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       }],
       document: null,
     });
-    setIsInputActive(false);
   }
 
   const handleModelChange = (modelId: string) => {
@@ -219,7 +197,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     const file = event.target.files?.[0];
     if (!file) return;
 
-    activateInput();
     setIsLoading(true);
     setLoadingMessage('Parsing document...');
     
@@ -286,8 +263,6 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     e.preventDefault();
     const userMessageContent = input.trim();
     if (!userMessageContent) return;
-
-    activateInput();
 
     if (!textGenerationModels.some(m => m.id === selectedModel)) {
       toast({
@@ -404,174 +379,143 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         </div>
       </CardHeader>
 
-      <div className="flex-grow min-h-0 flex flex-col relative">
-        <div 
-            className={cn(
-              "flex-grow flex flex-col transition-all duration-300 ease-in-out",
-              isInputActive ? 'justify-end' : 'justify-center'
-            )}
-        >
-            {isInputActive ? (
-                <ScrollArea className="h-full p-6 pt-0" viewportRef={scrollAreaRef}>
-                    {session.document && (
-                      <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10 backdrop-blur-sm">
-                          <div className="flex items-center gap-2">
-                              <FileText className="w-5 h-5 text-primary" />
-                              <span className="font-medium">{session.document.name}</span>
-                          </div>
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removeDocument}>
-                              <X className="h-4 w-4" />
-                          </Button>
-                      </div>
-                    )}
-                    <div className="space-y-6">
-                        {session.messages.map((message, index) => (
-                        <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''} animate-in`}>
-                            {message.role !== 'user' && (
-                            <Avatar className="w-8 h-8 border border-primary/20">
-                                <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
-                                <AvatarFallback className="bg-primary/10 text-primary">
-                                {message.role === 'assistant' ? <Bot size={20} /> : <FileText size={20} />}
-                                </AvatarFallback>
-                            </Avatar>
-                            )}
-                            <div className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                            message.role === 'user' ? 'bg-primary text-primary-foreground' :
-                            message.role === 'system' ? 'bg-muted/50 text-muted-foreground italic text-sm text-center w-full' :
-                            'bg-muted'
-                            }`}>
-                            {message.role === 'assistant' ? (
-                                <AssistantMessage 
-                                    message={message} 
-                                    isLastMessage={index === session.messages.length - 1}
-                                    isLoading={isLoading}
-                                    onAnimate={scrollToBottom}
-                                />
-                                ) : (
-                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                                )}
-                            </div>
-                            {message.role === 'user' && (
-                            <Avatar className="w-8 h-8 border">
-                                <AvatarImage src="https://i.pinimg.com/736x/74/5d/34/745d347f866bdba46dc4f2dc649b7d23.jpg" alt="User Avatar" />
-                                <AvatarFallback>
-                                <User size={20} />
-                                </AvatarFallback>
-                            </Avatar>
-                            )}
-                        </div>
-                        ))}
-                        {isLoading && (
-                        <div className="flex items-start gap-4 animate-in">
-                            <Avatar className="w-8 h-8 border border-primary/20">
-                                <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
-                                <AvatarFallback className="bg-primary/10 text-primary">
-                                <Bot size={20} />
-                                </AvatarFallback>
-                                </Avatar>
-                            <div className="rounded-lg px-4 py-3 bg-secondary flex items-center gap-2">
-                            <ThinkingIndicator />
-                            </div>
-                        </div>
-                        )}
-                    </div>
-                </ScrollArea>
-            ) : (
-                <div className="flex flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in-95">
-                    <div className="text-center font-headline text-6xl font-bold text-muted-foreground/20 select-none">
-                        <p>Anything.</p>
-                        <p>Everything.</p>
-                        <p>Just Ask.</p>
-                    </div>
+      <CardContent className="flex-grow p-6 min-h-0 relative">
+        <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
+          {session.document && (
+            <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10 backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary" />
+                    <span className="font-medium">{session.document.name}</span>
                 </div>
-            )}
-        </div>
-        
-        <CardFooter className={cn(
-            "shrink-0 flex flex-col gap-2 p-4 transition-all duration-300 ease-in-out",
-            isInputActive ? "border-t" : ""
-        )}>
-            <div
-                key={selectedModel}
-                className={cn(
-                    "text-center text-xs text-muted-foreground font-mono transition-opacity duration-300",
-                     isInputActive ? "opacity-100" : "opacity-0"
-                )}
-            >
-                Using: <span className="font-semibold text-foreground">{currentModelName}</span>
-            </div>
-            <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept=".pdf,.docx,.doc,.png,.jpg,.jpeg,.txt"
-                />
-            <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => fileInput_current?.click()}
-                aria-label="Upload document"
-                disabled={isLoading}
-            >
-                <Paperclip className="h-5 w-5" />
-            </Button>
-            <Input
-                value={input}
-                onFocus={activateInput}
-                onChange={(e) => {
-                    activateInput();
-                    setInput(e.target.value);
-                }}
-                placeholder={session.document ? `Ask about ${session.document.name}...` : "Ask a question..."}
-                disabled={isLoading}
-                autoComplete="off"
-            />
-            <Button type="submit" size="icon" disabled={isLoading || !input.trim()} aria-label="Send message">
-                <SendHorizonal className="h-5 w-5" />
-            </Button>
-            <Popover>
-                <PopoverTrigger asChild>
-                <Button type="button" variant="outline" size="icon" aria-label="Model Info">
-                    <Settings className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removeDocument}>
+                    <X className="h-4 w-4" />
                 </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80">
-                    <div className="grid gap-4">
-                        <div className="space-y-2">
-                            <h4 className="font-medium leading-none">Gemini AI Models</h4>
-                            <p className="text-sm text-muted-foreground">
-                                Select a model to use for the conversation.
-                            </p>
-                        </div>
-                        <RadioGroup value={selectedModel} onValueChange={handleModelChange}>
-                        {Object.entries(models).map(([category, modelList]) => (
-                            <div key={category} className="grid gap-2">
-                            <Label className="font-semibold">{category}</Label>
-                            {modelList.map((model) => (
-                                <Label htmlFor={model.id} key={model.id} className="flex items-start space-x-2 p-2 rounded-md hover:bg-muted/50 has-[[data-state=checked]]:bg-muted cursor-pointer">
-                                    <RadioGroupItem value={model.id} id={model.id} className="mt-1"/>
-                                    <div className="grid gap-1.5">
-                                    <span className="font-normal text-xs font-mono">{model.name}</span>
-                                    <p className="text-xs text-muted-foreground">{model.description}</p>
-
-                                    </div>
-                                </Label>
-                                )
-                            )}
-                            <Separator className="my-2" />
-                            </div>
-                        ))}
-                        </RadioGroup>
+            </div>
+          )}
+          <div className="space-y-6">
+            {session.messages.map((message, index) => (
+              <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''} animate-in`}>
+                {message.role !== 'user' && (
+                  <Avatar className="w-8 h-8 border border-primary/20">
+                    <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {message.role === 'assistant' ? <Bot size={20} /> : <FileText size={20} />}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+                <div className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                  message.role === 'user' ? 'bg-primary text-primary-foreground' :
+                  message.role === 'system' ? 'bg-muted/50 text-muted-foreground italic text-sm text-center w-full' :
+                  'bg-muted'
+                }`}>
+                  {message.role === 'assistant' ? (
+                      <AssistantMessage 
+                          message={message} 
+                          isLastMessage={index === session.messages.length - 1}
+                          isLoading={isLoading}
+                          onAnimate={scrollToBottom}
+                      />
+                      ) : (
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      )}
+                </div>
+                {message.role === 'user' && (
+                  <Avatar className="w-8 h-8 border">
+                    <AvatarImage src="https://i.pinimg.com/736x/74/5d/34/745d347f866bdba46dc4f2dc649b7d23.jpg" alt="User Avatar" />
+                    <AvatarFallback>
+                      <User size={20} />
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex items-start gap-4 animate-in">
+                <Avatar className="w-8 h-8 border border-primary/20">
+                    <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      <Bot size={20} />
+                    </AvatarFallback>
+                  </Avatar>
+                <div className="rounded-lg px-4 py-3 bg-secondary flex items-center gap-2">
+                  <ThinkingIndicator />
+                </div>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </CardContent>
+      
+      <CardFooter className="shrink-0 flex flex-col gap-2 p-4 pt-2 border-t">
+          <div className="text-center text-xs text-muted-foreground font-mono">
+            Using: <span className="font-semibold text-foreground">{currentModelName}</span>
+          </div>
+        <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept=".pdf,.docx,.doc,.png,.jpg,.jpeg,.txt"
+            />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => fileInputRef.current?.click()}
+            aria-label="Upload document"
+            disabled={isLoading}
+          >
+            <Paperclip className="h-5 w-5" />
+          </Button>
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={session.document ? `Ask about ${session.document.name}...` : "Ask a question..."}
+            disabled={isLoading}
+            autoComplete="off"
+          />
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim()} aria-label="Send message">
+            <SendHorizonal className="h-5 w-5" />
+          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button type="button" variant="outline" size="icon" aria-label="Model Info">
+                <Settings className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+                <div className="grid gap-4">
+                    <div className="space-y-2">
+                        <h4 className="font-medium leading-none">Gemini AI Models</h4>
+                        <p className="text-sm text-muted-foreground">
+                            Select a model to use for the conversation.
+                        </p>
                     </div>
-                </PopoverContent>
-            </Popover>
-            </form>
-        </CardFooter>
-      </div>
+                    <RadioGroup value={selectedModel} onValueChange={handleModelChange}>
+                    {Object.entries(models).map(([category, modelList]) => (
+                        <div key={category} className="grid gap-2">
+                        <Label className="font-semibold">{category}</Label>
+                        {modelList.map((model) => (
+                            <Label htmlFor={model.id} key={model.id} className="flex items-start space-x-2 p-2 rounded-md hover:bg-muted/50 has-[[data-state=checked]]:bg-muted cursor-pointer">
+                                <RadioGroupItem value={model.id} id={model.id} className="mt-1"/>
+                                <div className="grid gap-1.5">
+                                  <span className="font-normal text-xs font-mono">{model.name}</span>
+                                  <p className="text-xs text-muted-foreground">{model.description}</p>
+
+                                </div>
+                            </Label>
+                            )
+                        )}
+                        <Separator className="my-2" />
+                        </div>
+                    ))}
+                    </RadioGroup>
+                </div>
+            </PopoverContent>
+          </Popover>
+        </form>
+      </CardFooter>
     </Card>
   );
 }
-
