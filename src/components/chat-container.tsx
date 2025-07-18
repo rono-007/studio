@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef, type FormEvent } from 'react';
-import { Bot, User, Paperclip, SendHorizonal, Loader2, FileText, Settings, X, Trash2, LogIn, Copy, Check } from 'lucide-react';
+import { Bot, User, Paperclip, SendHorizonal, Loader2, FileText, Settings, X, Trash2, LogIn, Copy, Check, Sun, Moon } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,6 +32,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useTheme } from '@/context/theme-context';
 
 export type Message = {
   id: string;
@@ -164,6 +165,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
@@ -341,7 +343,11 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   return (
     <Card className="w-full h-full flex flex-col shadow-none border-none rounded-none md:rounded-lg md:border bg-card/80 backdrop-blur-sm">
       <CardHeader className="flex flex-row items-center justify-between py-4 px-6 shrink-0">
-        <div className="w-10"></div> {/* Spacer for the right button */}
+        <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <span className="sr-only">Toggle theme</span>
+        </Button>
         <div className="flex flex-col items-center">
             <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2 font-headline">
             <Bot className="text-primary" /> Infinitus
