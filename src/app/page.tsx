@@ -215,14 +215,14 @@ export default function Home({ params: {} }: { params: {} }) {
 
   return (
     <SidebarProvider>
-      <Sidebar side="left" collapsible="icon">
-        <SidebarHeader className="border rounded-md">
+      <Sidebar side="left" collapsible="icon" className="rounded-md border">
+        <SidebarHeader>
            <Button variant="ghost" className="w-full justify-center h-8 rounded-[5px]" onClick={createNewSession}>
             <MessageSquarePlus />
             <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">New Chat</span>
           </Button>
         </SidebarHeader>
-        <SidebarContent className="p-2 rounded-md">
+        <SidebarContent className="p-2">
           <SidebarMenu>
             {sessions.map((session) => (
               <SidebarMenuItem key={session.id}>
