@@ -116,15 +116,15 @@ const TypewriterText = ({ text, onAnimate }: { text: string; onAnimate: () => vo
 
 const AssistantMessage = ({ message, isLastMessage, onAnimate, isLoading }: { message: Message; isLastMessage: boolean; onAnimate: () => void; isLoading: boolean }) => {
     
-  const renderContent = (content: string) => {
+  const renderContent = () => {
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
     const parts = [];
     let lastIndex = 0;
     let match;
   
-    while ((match = codeBlockRegex.exec(content)) !== null) {
+    while ((match = codeBlockRegex.exec(message.content)) !== null) {
       if (match.index > lastIndex) {
-        const textPart = content.substring(lastIndex, match.index);
+        const textPart = message.content.substring(lastIndex, match.index);
         parts.push({ type: 'text', content: textPart });
       }
       
@@ -135,8 +135,8 @@ const AssistantMessage = ({ message, isLastMessage, onAnimate, isLoading }: { me
       lastIndex = codeBlockRegex.lastIndex;
     }
   
-    if (lastIndex < content.length) {
-      const textPart = content.substring(lastIndex);
+    if (lastIndex < message.content.length) {
+      const textPart = message.content.substring(lastIndex);
       parts.push({ type: 'text', content: textPart });
     }
   
@@ -150,8 +150,7 @@ const AssistantMessage = ({ message, isLastMessage, onAnimate, isLoading }: { me
             );
         }
         if (part.type === 'text') {
-            // Animate only the last text part of the last message
-            const shouldAnimate = isLastMessage && !isLoading && index === parts.length - 1;
+            const shouldAnimate = isLastMessage && !isLoading;
             return shouldAnimate ? (
                 <TypewriterText key={key} text={part.content} onAnimate={onAnimate} />
             ) : (
@@ -162,7 +161,7 @@ const AssistantMessage = ({ message, isLastMessage, onAnimate, isLoading }: { me
     });
   };
 
-  return <>{renderContent(message.content)}</>;
+  return <>{renderContent()}</>;
 };
 
 
@@ -397,11 +396,11 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       <CardContent className="flex-grow p-6 min-h-0 relative">
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center -z-10 opacity-5 pointer-events-none">
             <div className="font-headline text-6xl md:text-8xl font-bold text-muted-foreground select-none">
-              <p><span className="inline-block animate-pop-in" style={{ animationDelay: '0.2s' }}>Anything.</span></p>
-              <p><span className="inline-block animate-pop-in" style={{ animationDelay: '0.7s' }}>Everything.</span></p>
+              <p><span className="inline-block animate-fade-in" style={{ animationDelay: '0.2s' }}>Anything.</span></p>
+              <p><span className="inline-block animate-fade-in" style={{ animationDelay: '0.9s' }}>Everything.</span></p>
               <p>
-                <span className="inline-block animate-pop-in" style={{ animationDelay: '1.2s' }}>Just</span>
-                <span className="inline-block animate-pop-in" style={{ animationDelay: '1.5s' }}> Ask.</span>
+                <span className="inline-block animate-fade-in" style={{ animationDelay: '1.6s' }}>Just</span>
+                <span className="inline-block animate-fade-in" style={{ animationDelay: '2.1s' }}> Ask.</span>
               </p>
             </div>
           </div>
