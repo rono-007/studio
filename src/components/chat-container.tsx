@@ -383,6 +383,13 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       </CardHeader>
 
       <CardContent className="flex-grow p-6 min-h-0 relative">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center -z-10 opacity-5 pointer-events-none">
+            <div className="font-headline text-6xl md:text-8xl font-bold text-muted-foreground select-none">
+              <p>Anything.</p>
+              <p>Everything.</p>
+              <p>Just Ask.</p>
+            </div>
+          </div>
           <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
             {session.document && (
               <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10 backdrop-blur-sm">
