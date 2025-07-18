@@ -338,6 +338,8 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
 
   const currentModelName = allModels.find(m => m.id === selectedModel)?.name || selectedModel;
+  
+  const isNewChat = session.messages.length <= 1;
 
   return (
     <Card className="w-full h-full flex flex-col rounded-none md:rounded-lg border-0 md:border bg-card/80 backdrop-blur-sm shadow-none">
@@ -381,70 +383,93 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       </CardHeader>
 
       <CardContent className="flex-grow p-6 min-h-0 relative">
-        <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
-          {session.document && (
-            <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-primary" />
-                    <span className="font-medium">{session.document.name}</span>
-                </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removeDocument}>
-                    <X className="h-4 w-4" />
-                </Button>
-            </div>
-          )}
-          <div className="space-y-6">
-            {session.messages.map((message, index) => (
-              <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''} animate-in`}>
-                {message.role !== 'user' && (
-                  <Avatar className="w-8 h-8 border border-primary/20">
-                    <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      {message.role === 'assistant' ? <Bot size={20} /> : <FileText size={20} />}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-                <div className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                  message.role === 'user' ? 'bg-primary text-primary-foreground' :
-                  message.role === 'system' ? 'bg-muted/50 text-muted-foreground italic text-sm text-center w-full' :
-                  'bg-muted'
-                }`}>
-                  {message.role === 'assistant' ? (
-                      <AssistantMessage 
-                          message={message} 
-                          isLastMessage={index === session.messages.length - 1}
-                          isLoading={isLoading}
-                          onAnimate={scrollToBottom}
-                      />
-                      ) : (
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      )}
-                </div>
-                {message.role === 'user' && (
-                  <Avatar className="w-8 h-8 border">
-                    <AvatarImage src="https://i.pinimg.com/736x/74/5d/34/745d347f866bdba46dc4f2dc649b7d23.jpg" alt="User Avatar" />
-                    <AvatarFallback>
-                      <User size={20} />
-                    </AvatarFallback>
-                  </Avatar>
-                )}
+        {isNewChat ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+             <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center text-muted-foreground/10 font-bold font-headline select-none">
+                <h2 className="text-8xl md:text-9xl">Anything.</h2>
+                <h2 className="text-8xl md:text-9xl">Everything.</h2>
+                <h2 className="text-8xl md:text-9xl">Just Ask.</h2>
               </div>
-            ))}
-            {isLoading && (
-              <div className="flex items-start gap-4 animate-in">
-                <Avatar className="w-8 h-8 border border-primary/20">
-                    <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      <Bot size={20} />
-                    </AvatarFallback>
-                  </Avatar>
-                <div className="rounded-lg px-4 py-3 bg-secondary flex items-center gap-2">
-                  <ThinkingIndicator />
-                </div>
+            </div>
+            <div className="relative z-10 flex items-start gap-4 animate-in">
+              <Avatar className="w-8 h-8 border border-primary/20">
+                <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
+                <AvatarFallback className="bg-primary/10 text-primary">
+                  <Bot size={20} />
+                </AvatarFallback>
+              </Avatar>
+              <div className="rounded-lg px-4 py-2 max-w-[80%] bg-muted">
+                <p className="text-sm whitespace-pre-wrap">{session.messages[0]?.content}</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
+            {session.document && (
+              <div className="mb-4 p-3 rounded-md bg-muted/50 flex items-center justify-between text-sm sticky top-0 z-10 backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-primary" />
+                      <span className="font-medium">{session.document.name}</span>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={removeDocument}>
+                      <X className="h-4 w-4" />
+                  </Button>
               </div>
             )}
-          </div>
-        </ScrollArea>
+            <div className="space-y-6">
+              {session.messages.map((message, index) => (
+                <div key={message.id} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''} animate-in`}>
+                  {message.role !== 'user' && (
+                    <Avatar className="w-8 h-8 border border-primary/20">
+                      <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {message.role === 'assistant' ? <Bot size={20} /> : <FileText size={20} />}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                    message.role === 'user' ? 'bg-primary text-primary-foreground' :
+                    message.role === 'system' ? 'bg-muted/50 text-muted-foreground italic text-sm text-center w-full' :
+                    'bg-muted'
+                  }`}>
+                    {message.role === 'assistant' ? (
+                        <AssistantMessage 
+                            message={message} 
+                            isLastMessage={index === session.messages.length - 1}
+                            isLoading={isLoading}
+                            onAnimate={scrollToBottom}
+                        />
+                        ) : (
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                        )}
+                  </div>
+                  {message.role === 'user' && (
+                    <Avatar className="w-8 h-8 border">
+                      <AvatarImage src="https://i.pinimg.com/736x/74/5d/34/745d347f866bdba46dc4f2dc649b7d23.jpg" alt="User Avatar" />
+                      <AvatarFallback>
+                        <User size={20} />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
+              ))}
+              {isLoading && (
+                <div className="flex items-start gap-4 animate-in">
+                  <Avatar className="w-8 h-8 border border-primary/20">
+                      <AvatarImage src="https://t4.ftcdn.net/jpg/09/43/48/93/360_F_943489384_zq3u5kkefFjPY3liE6t81KrX8W3lvxSz.jpg" alt="AI Avatar" />
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        <Bot size={20} />
+                      </AvatarFallback>
+                    </Avatar>
+                  <div className="rounded-lg px-4 py-3 bg-secondary flex items-center gap-2">
+                    <ThinkingIndicator />
+                  </div>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        )}
       </CardContent>
       
       <CardFooter className="shrink-0 flex flex-col gap-2 p-4 pt-2">
