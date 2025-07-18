@@ -383,7 +383,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       </CardHeader>
 
       <CardContent className="flex-grow p-6 min-h-0 relative">
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center -z-10 opacity-5 pointer-events-none">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center -z-10 opacity-5 pointer-events-none animate-in">
             <div className="font-headline text-6xl md:text-8xl font-bold text-muted-foreground select-none">
               <p>Anything.</p>
               <p>Everything.</p>
