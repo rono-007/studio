@@ -25,6 +25,14 @@
     --input: 228 10% 92%; /* Very Light Gray */
     --ring: 228 17% 39%; /* Dark Slate Blue */
     --radius: 0.5rem;
+
+    /* Custom Sidebar Colors */
+    --sidebar-background: 240 20% 98%; /* Almost White, same as card */
+    --sidebar-foreground: 228 17% 29%; /* Dark Slate Blue */
+    --sidebar-border: 228 10% 84%; /* Light Gray */
+    --sidebar-accent: 228 10% 89%; /* Lighter Gray for hover/active */
+    --sidebar-accent-foreground: 228 17% 29%; /* Dark Slate Blue */
+    --sidebar-ring: 228 17% 39%; /* Dark Slate Blue */
   }
 
   .dark {
