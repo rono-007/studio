@@ -396,12 +396,9 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       <CardContent className="flex-grow p-6 min-h-0 relative">
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center -z-10 opacity-5 pointer-events-none">
             <div className="font-headline text-6xl md:text-8xl font-bold text-muted-foreground select-none">
-              <p><span className="inline-block animate-fade-in" style={{ animationDelay: '0.2s' }}>Anything.</span></p>
-              <p><span className="inline-block animate-fade-in" style={{ animationDelay: '0.9s' }}>Everything.</span></p>
-              <p>
-                <span className="inline-block animate-fade-in" style={{ animationDelay: '1.6s' }}>Just</span>
-                <span className="inline-block animate-fade-in" style={{ animationDelay: '2.1s' }}> Ask.</span>
-              </p>
+              <p>Anything.</p>
+              <p>Everything.</p>
+              <p>Just Ask.</p>
             </div>
           </div>
           <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
