@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, type FormEvent, useCallback } from 'react';
@@ -446,7 +447,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
         </ScrollArea>
       </CardContent>
       
-      <CardFooter className="shrink-0 flex flex-col gap-2 p-4 pt-2 border-t">
+      <CardFooter className="shrink-0 flex flex-col gap-2 p-4 pt-2">
           <div className="text-center text-xs text-muted-foreground font-mono">
             Using: <span className="font-semibold text-foreground">{currentModelName}</span>
           </div>
