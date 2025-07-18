@@ -380,7 +380,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
             </AlertDialog>
         </div>
       </CardHeader>
-      <CardContent className="flex-grow p-6 pt-0 min-h-0 relative">
+      <CardContent className="flex-grow p-6 min-h-0 relative pt-0">
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
             <div className="text-center font-headline text-6xl font-bold text-muted-foreground/20 select-none">
                 <p>Anything.</p>
@@ -453,7 +453,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="pt-6 shrink-0 flex flex-col gap-2">
+      <CardFooter className="shrink-0 flex flex-col gap-2 pt-2">
         <div
             key={selectedModel}
             className="text-center text-xs text-muted-foreground font-mono animate-in fade-in zoom-in-95"
