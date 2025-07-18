@@ -382,7 +382,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       </CardHeader>
       <CardContent className="flex-grow p-6 min-h-0 relative">
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
-            <div className="text-center font-headline text-6xl font-bold text-muted-foreground/10 select-none">
+            <div className="text-center font-headline text-6xl font-bold text-muted-foreground/20 select-none">
                 <p>Anything.</p>
                 <p>Everything.</p>
                 <p>Just Ask.</p>
