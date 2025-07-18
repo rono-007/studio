@@ -293,7 +293,7 @@ export default function Home({ params: {} }: { params: {} }) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <div className="h-screen flex flex-col items-stretch">
+        <div className="flex h-full min-h-screen flex-col items-stretch">
             <div className="md:hidden flex items-center p-2 border-b shrink-0 bg-card">
                <SidebarTrigger />
             </div>
