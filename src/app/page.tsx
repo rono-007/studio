@@ -222,7 +222,7 @@ export default function Home({ params: {} }: { params: {} }) {
             <span className="duration-200 transition-opacity ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:ml-0 ml-2">New Chat</span>
           </Button>
         </SidebarHeader>
-        <SidebarContent className="p-2">
+        <SidebarContent className="p-2 rounded-[5px]">
           <SidebarMenu>
             {sessions.map((session) => (
               <SidebarMenuItem key={session.id}>
