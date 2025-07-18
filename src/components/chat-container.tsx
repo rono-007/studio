@@ -109,10 +109,13 @@ const models = {
 const allModels = Object.values(models).flat();
 const textGenerationModels = models["Text-out models"];
 
-const AssistantMessage = ({ message, isLastMessage, onAnimate, isLoading }: { message: Message; isLastMessage: boolean; onAnimate: () => void; isLoading: boolean }) => {
-  const animatedContent = useTypewriter(message.content, 5, { onUpdate: onAnimate });
-  const contentToRender = isLastMessage && !isLoading ? animatedContent : message.content;
+const TypewriterText = ({ text, onAnimate }: { text: string; onAnimate: () => void }) => {
+  const displayedText = useTypewriter(text, 5, { onUpdate: onAnimate });
+  return <p className="text-sm whitespace-pre-wrap">{displayedText}</p>;
+};
 
+const AssistantMessage = ({ message, isLastMessage, onAnimate, isLoading }: { message: Message; isLastMessage: boolean; onAnimate: () => void; isLoading: boolean }) => {
+    
   const renderContent = (content: string) => {
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
     const parts = [];
@@ -121,36 +124,45 @@ const AssistantMessage = ({ message, isLastMessage, onAnimate, isLoading }: { me
   
     while ((match = codeBlockRegex.exec(content)) !== null) {
       if (match.index > lastIndex) {
-        parts.push(
-          <p key={`${message.id}-text-${lastIndex}`} className="text-sm whitespace-pre-wrap">
-            {content.substring(lastIndex, match.index)}
-          </p>
-        );
+        const textPart = content.substring(lastIndex, match.index);
+        parts.push({ type: 'text', content: textPart });
       }
       
       const language = match[1] || 'text';
       const code = match[2];
-      parts.push(
-        <div key={`${message.id}-code-${match.index}`} className="my-2 rounded-md overflow-hidden bg-[#2d2d2d]">
-          <CodeBlock language={language} value={code.trim()} />
-        </div>
-      );
+      parts.push({ type: 'code', content: code.trim(), language });
       
       lastIndex = codeBlockRegex.lastIndex;
     }
   
     if (lastIndex < content.length) {
-      parts.push(
-        <p key={`${message.id}-text-${lastIndex}`} className="text-sm whitespace-pre-wrap">
-          {content.substring(lastIndex)}
-        </p>
-      );
+      const textPart = content.substring(lastIndex);
+      parts.push({ type: 'text', content: textPart });
     }
   
-    return parts;
+    return parts.map((part, index) => {
+        const key = `${message.id}-part-${index}`;
+        if (part.type === 'code') {
+            return (
+                <div key={key} className="my-2 rounded-md overflow-hidden bg-[#2d2d2d]">
+                    <CodeBlock language={part.language!} value={part.content} />
+                </div>
+            );
+        }
+        if (part.type === 'text') {
+            // Animate only the last text part of the last message
+            const shouldAnimate = isLastMessage && !isLoading && index === parts.length - 1;
+            return shouldAnimate ? (
+                <TypewriterText key={key} text={part.content} onAnimate={onAnimate} />
+            ) : (
+                <p key={key} className="text-sm whitespace-pre-wrap">{part.content}</p>
+            );
+        }
+        return null;
+    });
   };
 
-  return <>{renderContent(contentToRender)}</>;
+  return <>{renderContent(message.content)}</>;
 };
 
 
