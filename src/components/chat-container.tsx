@@ -342,7 +342,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   return (
     <Card className="w-full h-full flex flex-col rounded-lg border bg-card/80 backdrop-blur-sm shadow-none">
-      <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0 pb-0">
+      <CardHeader className="flex flex-row items-center p-4 px-6 shrink-0">
         <div className="flex w-1/3 justify-start">
             <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
                 <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -453,7 +453,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="shrink-0 flex flex-col gap-2 pt-2 border-t">
+      <CardFooter className="shrink-0 flex flex-col gap-2 pt-4 border-t">
         <div
             key={selectedModel}
             className="text-center text-xs text-muted-foreground font-mono animate-in fade-in zoom-in-95"
@@ -512,6 +512,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
                                 <div className="grid gap-1.5">
                                   <span className="font-normal text-xs font-mono">{model.name}</span>
                                   <p className="text-xs text-muted-foreground">{model.description}</p>
+
                                 </div>
                               </Label>
                             )
@@ -528,3 +529,5 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
+
+    
