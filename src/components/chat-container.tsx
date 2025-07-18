@@ -341,7 +341,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
   const currentModelName = allModels.find(m => m.id === selectedModel)?.name || selectedModel;
 
   return (
-    <Card className="w-full h-full flex flex-col rounded-lg border bg-card/80 backdrop-blur-sm shadow-none">
+    <Card className="w-full h-full flex flex-col rounded-none md:rounded-lg border-0 md:border bg-card/80 backdrop-blur-sm shadow-none">
       <CardHeader className="flex flex-row items-center p-4 px-6 shrink-0">
         <div className="flex w-1/3 justify-start">
             <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
@@ -453,7 +453,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="shrink-0 flex flex-col gap-2 pt-4 rounded-b-lg">
+      <CardFooter className="shrink-0 flex flex-col gap-2 p-4">
         <div
             key={selectedModel}
             className="text-center text-xs text-muted-foreground font-mono animate-in fade-in zoom-in-95"
