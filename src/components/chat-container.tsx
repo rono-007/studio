@@ -397,11 +397,11 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
       <CardContent className="flex-grow p-6 min-h-0 relative">
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center -z-10 opacity-5 pointer-events-none">
             <div className="font-headline text-6xl md:text-8xl font-bold text-muted-foreground select-none">
-              <p><span className="inline-block animate-pop-in" style={{ animationDelay: '0.1s' }}>Anything.</span></p>
-              <p><span className="inline-block animate-pop-in" style={{ animationDelay: '0.2s' }}>Everything.</span></p>
+              <p><span className="inline-block animate-pop-in" style={{ animationDelay: '0.2s' }}>Anything.</span></p>
+              <p><span className="inline-block animate-pop-in" style={{ animationDelay: '0.7s' }}>Everything.</span></p>
               <p>
-                <span className="inline-block animate-pop-in" style={{ animationDelay: '0.3s' }}>Just</span>
-                <span className="inline-block animate-pop-in" style={{ animationDelay: '0.4s' }}> Ask.</span>
+                <span className="inline-block animate-pop-in" style={{ animationDelay: '1.2s' }}>Just</span>
+                <span className="inline-block animate-pop-in" style={{ animationDelay: '1.5s' }}> Ask.</span>
               </p>
             </div>
           </div>
