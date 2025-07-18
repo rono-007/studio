@@ -79,7 +79,7 @@ const CodeBlock = ({ language, value }: { language: string, value: string }) => 
       >
         {isCopied ? <Check size={16} /> : <Copy size={16} />}
       </button>
-      <SyntaxHighlighter language={language} style={atomDark} customStyle={{ margin: 0, padding: '1rem' }}>
+      <SyntaxHighlighter language={language} style={atomDark} customStyle={{ margin: 0, padding: '1rem', background: 'transparent' }}>
         {value}
       </SyntaxHighlighter>
     </div>
@@ -144,7 +144,7 @@ const AssistantMessage = ({ message, isLastMessage, onAnimate, isLoading }: { me
         const key = `${message.id}-part-${index}`;
         if (part.type === 'code') {
             return (
-                <div key={key} className="my-2 rounded-md overflow-hidden bg-[#2d2d2d]">
+                <div key={key} className="my-2 rounded-md overflow-hidden">
                     <CodeBlock language={part.language!} value={part.content} />
                 </div>
             );
