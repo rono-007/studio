@@ -342,7 +342,7 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
 
   return (
     <Card className="w-full h-full flex flex-col rounded-lg border bg-card/80 backdrop-blur-sm shadow-none">
-      <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0">
+      <CardHeader className="flex flex-row items-center py-4 px-6 shrink-0 pb-0">
         <div className="flex w-1/3 justify-start">
             <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
                 <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -528,3 +528,5 @@ export function ChatContainer({ session, onSessionUpdate }: ChatContainerProps) 
     </Card>
   );
 }
+
+    
